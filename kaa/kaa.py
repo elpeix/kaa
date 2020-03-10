@@ -20,9 +20,7 @@ class Kaa():
     def __setArgs(self, argv):
         try:
             opts, args = getopt.getopt(argv,"hh:p",["host=","port="])
-            logging.info("Args:", args)
-        except getopt.GetoptError as e:
-            logging.error("Args error", e)
+        except getopt.GetoptError:
             sys.exit(2)
         for opt, arg in opts:
             if opt in ("-h", "--host"):
