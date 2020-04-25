@@ -10,12 +10,25 @@ from kaa.response import Response
 class Resources(resources.Resources):
 
     @GET
-    @PATH('/resource/{id}/')
-    def createLogiCommerce(self, id):
+    @PATH('')
+    def baseResource(self):
         result = {
-            "request": self.request,
-            "status": "success",
-            "id": id,
-            "message": "Get resource"
+            "message": "Get resource /"
         }
         return Response(Status.OK).json(result)
+
+    @GET
+    @PATH('/resource/{id}/')
+    def resourceWithId(self, id):
+        result = {
+            "queryParams": self.request.query,
+            "status": "success",
+            "id": id,
+            "message": "Get resource /resource/{id}/"
+        }
+        return Response(Status.OK).json(result)
+
+    @GET
+    @PATH('/error')
+    def errorResource(self):
+        raise Exception("This is an error")
