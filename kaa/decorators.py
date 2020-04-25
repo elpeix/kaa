@@ -52,7 +52,6 @@ def PATH(url):
             if (len(splitRequestPath) != len(splitDefinedPath)):
                 return
 
-            # pathRegexp = r'\/((\{([a-z][a-zA-Z0-9_]+(:[^}]+){0,1})+\}|[a-zA-Z0-9_]+)\/?)*\/?'
             valueRegexp = r'^\{([a-z_][a-zA-Z0-9_]+)(:[^}]+){0,1}\}$'
             arguments = dict()
             for i in range(len(splitDefinedPath)):
