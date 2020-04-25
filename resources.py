@@ -1,13 +1,13 @@
-from kaa.decorators import GET, PATH
-from kaa.view import View
-from kaa.response import Response
-from kaa.enums import Status, ContentType
 import json
 
-class Resources(View):
+from kaa import resources
+from kaa.decorators import GET, PATH
+from kaa.enums import ContentType, Status
+from kaa.request import Request
+from kaa.response import Response
 
-    def __init__(self):
-        super().__init__()
+
+class Resources(resources.Resources):
 
     @GET
     @PATH('/resource/{id}/')

@@ -1,7 +1,7 @@
 import importlib
 from kaa.response import Response
 from kaa.request import Request
-from kaa.view import View
+from kaa.resources import Resources
 from kaa.enums import Status, ContentType
 
 class Rest():
@@ -20,7 +20,7 @@ class Rest():
     def run(self, moduleName, clazz):
         module = importlib.import_module(moduleName)
         class_ = getattr(module, clazz)
-        instance:View = class_(self.request)
+        instance:Resources = class_(self.request)
         for methodName in dir(class_):
             count = 1 + len(clazz) + 2
             if methodName[:2] == "__" or methodName[:count] == "_{clazz}__".format(clazz=clazz):
