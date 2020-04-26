@@ -21,7 +21,7 @@ class Cli():
             subcommand = 'help'
         
         if subcommand == 'version':
-            msg = VERSION
+            msg = self.__get_version
         elif subcommand == 'help':
             msg = self.__get_help()
         elif subcommand == 'serve':
@@ -32,6 +32,12 @@ class Cli():
         
         sys.stdout.write(msg + '\n')
     
+    def __get_name(self):
+        return NAME
+    
+    def __get_version(self):
+        return VERSION
+    
     def __get_help(self):
         commands = [
             ('version', 'Returns Kaa version'),
@@ -41,7 +47,7 @@ class Cli():
     
     def __serve(self): 
         self.__set_host_port()
-        sys.stdout.write('{} version {}\n'.format(NAME, VERSION))
+        sys.stdout.write('{} version {}\n'.format(self.__get_name(), self.__get_version()))
         sys.stdout.write('Server started at {}:{}\n\n'.format(self.host, self.port))
         make_server(self.host, int(self.port), application).serve_forever()
         return 'eps'
