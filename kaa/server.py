@@ -7,6 +7,7 @@ from .filters import RequestFilter, ResponseFilter
 from .request import Request
 from .resources import Resources
 from .response import Response
+import kaa
 
 
 class Kaa():
@@ -82,6 +83,6 @@ class Kaa():
     
     def __printResponse(self, response:Response):
         headers = [(k, response.headers[k]) for k in response.headers]
-        headers.append(('Server', 'KAA/0.0.1'))
+        headers.append(('Server', '{}/{}'.format(kaa.NAME, kaa.VERSION)))
         self.start_response(response.getStatusCode(), headers)
         return [response.responseBody.encode("utf8")]
