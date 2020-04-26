@@ -41,3 +41,19 @@ class NotFoundError(KaaError):
 class ResourceNotFoundError(KaaError):
     def __init__(self):
         super().__init__('Resource not found', Status.NOT_FOUND)
+
+class BadRequestError(KaaError):
+    def __init__(self, msg, err=None):
+        super().__init__(msg, Status.BAD_REQUEST, err)
+
+class UnathorizedError(KaaError):
+    def __init__(self, msg, err=None):
+        super().__init__(msg, Status.UNAUTHORIZED, err)
+
+class ForbiddenError(KaaError):
+    def __init__(self, msg, err=None):
+        super().__init__(msg, Status.FORBIDDEN, err)
+
+class MethodNotAllowedError(KaaError):
+    def __init__(self, msg, err=None):
+        super().__init__(msg, Status.METHOD_NOT_ALLOWED, err)
