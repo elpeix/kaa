@@ -1,49 +1,62 @@
-from kaa.enums import Status, ContentType
-from kaa.request import Request
 import json
+import traceback
+
+from definitions import DEBUG, LOG
+from kaa.enums import ContentType, Status
+from kaa.request import Request
+
 
 class Response():
 
     def __init__(self, status:Status=Status.OK):
         self.responseBody = None
         self.status = status
-        self.contentType = ContentType.PLAIN
+        self.headers = dict()
+        self.setContentType(ContentType.PLAIN)
     
     def body(self, responseBody:str):
         self.responseBody = responseBody
         return self
     
     def html(self, html:str):
-        self.contentType = ContentType.HTML
+        self.setContentType(ContentType.HTML)
         return self.body(json.dumps(html))
     
     def json(self, response:dict):
-        self.contentType = ContentType.JSON
+        self.setContentType(ContentType.JSON)
         return self.body(json.dumps(response))
 
     def getStatusCode(self):
-        return self.status.value
+        return self.status.value[1]
 
     def setContentType(self, contentType:ContentType):
-        self.contentType = contentType
-
-    def getContentType(self):
-        return self.contentType.value
+        self.header('Content-Type', contentType.value)
+    
+    def header(self, headerName, headerValue):
+        self.headers[headerName] = headerValue
+        return self
 
     def notFound(self, request:Request):
         self.status = Status.NOT_FOUND
-        return self.__setResponse(request, 404, 'Resource not found')
+        return self.__setResponse(request, 'Resource not found')
     
     def forbidden(self, request:Request):
         self.status = Status.FORBIDDEN
-        return self.__setResponse(request, 403, 'Fobidden')
+        return self.__setResponse(request, 'Fobidden')
     
-    def __setResponse(self, request, statusCode, message):
+    def serverError(self, request:Request, exc_info=None):
+        self.status = Status.SERVER_ERROR
+        data = {}
+        if exc_info:
+            if DEBUG:
+                data['exception'] = traceback.format_exception(*exc_info)
+            else:
+                LOG.error(self.status.value, exc_info=exc_info)
+        return self.__setResponse(request, 'Internal server error', data)
+    
+    def __setResponse(self, request, message, data:dict={}):
         if request.getHeader('ACCEPT') == 'application/json':
-            self.contentType = ContentType.JSON
-            self.json({'status': statusCode, 'message': message})
+            self.json({'status': self.status.value[0], 'message': message, **data})
         else:
-            self.contentType = ContentType.PLAIN
-            self.body(message)
-        
+            self.body(message + "\n" + str(data) if data else message)
         return self
