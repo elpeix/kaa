@@ -1,25 +1,26 @@
-import getopt
-import logging
+import importlib
 import sys
-from wsgiref.simple_server import make_server
 
-from definitions import DEBUG, LOG
-from kaa.rest import Rest
+from .enums import ContentType, Status
+from .exceptions import KaaError, ResourceNotFoundError
+from .filters import RequestFilter, ResponseFilter
+from .request import Request
+from .resources import Resources
+from .response import Response
 
 
 class Kaa():
 
-    def __init__(self):
-        self.host = ''
-        self.port = 8086
-        self.__setArgs(sys.argv[1:])
-        self.resources = dict()
-        self.request_filters = dict()
-        self.response_filters = dict()
+    def __init__(self, env, start_response, resources:dict={}, request_filters:dict={}, response_filters:dict={}):
+        self.start_response = start_response
+        self.request = Request(env)
+        self.resources = resources
+        self.request_filters = request_filters
+        self.response_filters = response_filters
 
     def registerResources(self, module:str, className:str):
         self.__register(self.resources, module, className)
-    
+
     def registerFilterRequest(self, module:str, className):
         self.__register(self.request_filters, module, className)
 
@@ -31,23 +32,56 @@ class Kaa():
             element[module] = []
         element[module].append(className)
 
-    def __setArgs(self, argv):
+    def serve(self):
         try:
-            opts, args = getopt.getopt(argv,"hh:p",["host=","port="])
-            if DEBUG:
-                LOG.info("Args:", args=args)
-        except getopt.GetoptError as e:
-            LOG.error("Error", exc_info=e)
-            sys.exit(2)
-        for opt, arg in opts:
-            if opt in ("-h", "--host"):
-                self.host = arg
-            elif opt in ("-p", "--port"):
-                self.port = arg
+            self.__requestFilters()
+            for moduleName in self.resources:
+                for className in self.resources[moduleName]:
+                    response:Response = self.__runResource(moduleName, className)
+                    if response:
+                        self.__responseFilters(response)
+                        return self.__printResponse(response)
+            raise ResourceNotFoundError()
+        except KaaError as e:
+            return self.__printResponse(e.response())
+        except:
+            return self.__printResponse(Response().serverError(self.request, sys.exc_info()))
     
-    def __serve(self, env, start_response):
-        rest = Rest(env, start_response, self.request_filters, self.response_filters)
-        return rest.serve(self.resources)
+    def __requestFilters(self):
+        def func(instance:RequestFilter):
+            method_ = getattr(instance, 'filter')
+            method_(instance, self.request)
+        self.__callFilters(self.request_filters, func)
+
+    def __responseFilters(self, response:Response):
+        def func(instance:ResponseFilter):
+            method_ = getattr(instance, 'filter')
+            method_(instance, self.request, response)
+        self.__callFilters(self.response_filters, func)
     
-    def run(self):
-        make_server(self.host, int(self.port), self.__serve).serve_forever()
+    def __callFilters(self, filters, func):
+        for moduleName in filters:
+            for className in filters[moduleName]:
+                func(self.__getClass(moduleName, className))
+
+    def __runResource(self, moduleName, className) -> Response:
+        class_ = self.__getClass(moduleName, className)
+        instance:Resources = class_(self.request)
+        for methodName in dir(class_):
+            count = 1 + len(className) + 2
+            if methodName[:2] == "__" or methodName[:count] == "_{className}__".format(className=className):
+                continue
+            method_ = getattr(class_, methodName)
+            result = method_(instance)
+            if result:
+                return result
+    
+    def __getClass(self, moduleName, className):
+        module = importlib.import_module(moduleName)
+        return getattr(module, className)
+    
+    def __printResponse(self, response:Response):
+        headers = [(k, response.headers[k]) for k in response.headers]
+        headers.append(('Server', 'KAA/0.0.1'))
+        self.start_response(response.getStatusCode(), headers)
+        return [response.responseBody.encode("utf8")]
