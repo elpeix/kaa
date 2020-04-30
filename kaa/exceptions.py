@@ -57,3 +57,6 @@ class ForbiddenError(KaaError):
 class MethodNotAllowedError(KaaError):
     def __init__(self, msg, err=None):
         super().__init__(msg, Status.METHOD_NOT_ALLOWED, err)
+
+class InvalidParamError(BadRequestError):
+    pass
