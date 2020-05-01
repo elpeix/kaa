@@ -88,15 +88,14 @@ def PATH(url, query_params:dict={}):
 
 class QueryParams:
 
-    params = dict()
-
     def __init__(self, request:Request):
         self.request = request
 
     def get_params(self, defined_params:dict={}):
+        params = {}
         for k in defined_params:
-            self.params[k] = self.__get_item(k, defined_params[k])
-        return self.params
+            params[k] = self.__get_item(k, defined_params[k])
+        return params
 
     def __get_item(self, defined_key, defined_value):
         q_value = self.request.get_query_param(defined_key)
@@ -110,7 +109,7 @@ class QueryParams:
 
         if 'default' in defined_value:
             return defined_value['default']
-    
+
     def __get_int(self, param, value):
         try:
             return int(value)
