@@ -19,7 +19,7 @@ class Cli():
             subcommand = self.argv[1]
         except IndexError:
             subcommand = 'help'
-        
+
         if subcommand == 'version':
             msg = self.__get_version
         elif subcommand == 'help':
@@ -29,29 +29,29 @@ class Cli():
             return
         else:
             msg = 'Invalid command. Try help'
-        
+
         sys.stdout.write(msg + '\n')
-    
+
     def __get_name(self):
         return NAME
-    
+
     def __get_version(self):
         return VERSION
-    
+
     def __get_help(self):
         commands = [
             ('version', 'Returns Kaa version'),
             ('server', 'Starts a server for development')
         ]
         return '\n'.join(['{}\t\t{}'.format(*cmd) for cmd in commands])
-    
-    def __serve(self): 
+
+    def __serve(self):
         self.__set_host_port()
         sys.stdout.write('{} version {}\n'.format(self.__get_name(), self.__get_version()))
         sys.stdout.write('Server started at {}:{}\n\n'.format(self.host, self.port))
         make_server(self.host, int(self.port), application).serve_forever()
         return 'eps'
-    
+
     def __set_host_port(self):
         try:
             porthost = self.argv[2].split(':')
@@ -65,6 +65,7 @@ class Cli():
                 sys.exit(1)
         except IndexError:
             pass
+
 
 if __name__ == "__main__":
     cli = Cli()
