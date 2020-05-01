@@ -6,9 +6,11 @@ class OnRequest(RequestFilter):
         if request.path == '/invalid':
             raise NotFoundError('Invalid resource')
 
+
 class OnResponse(ResponseFilter):
     def filter(self, request:Request, response:Response):
         response.header('x-response', 'anyResponse')
+
 
 class EnableCors(ResponseFilter):
     def filter(self, request:Request, response:Response):
