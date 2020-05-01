@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Status(Enum):
     OK = [200, '200 Ok']
     CREATED = [201, '201 Created']
@@ -13,6 +14,7 @@ class Status(Enum):
     NOT_FOUND = [404, '404 Not found']
     METHOD_NOT_ALLOWED = [405, '405 Method not allowed']
     SERVER_ERROR = [500, '500 Server error']
+
 
 class ContentType(Enum):
     PLAIN = 'text/plain'
