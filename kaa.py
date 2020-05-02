@@ -41,7 +41,7 @@ class Cli():
     def __get_help(self):
         commands = [
             ('version', 'Returns Kaa version'),
-            ('server', 'Starts a server for development')
+            ('serve', 'Starts a server for development')
         ]
         return '\n'.join(['{}\t\t{}'.format(*cmd) for cmd in commands])
 
