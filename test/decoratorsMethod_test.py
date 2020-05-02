@@ -1,7 +1,9 @@
 from mock import Mock
+
 from kaa import decorators
 
 from .decorators_test import DecoratorsTest
+
 
 class DecoratorsMethodTest(DecoratorsTest):
 

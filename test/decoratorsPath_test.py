@@ -9,7 +9,7 @@ class DecoratorPathTest(DecoratorsTest):
         func = pathFunc(self.__setAssertArgs())
         result = func(self.getResource(path='/otherPath'))
         self.assertFalse(result)
-    
+
     def testPathBase(self):
         pathFunc = decorators.PATH('')
         func = pathFunc(self.__setAssertArgs())
@@ -33,7 +33,7 @@ class DecoratorPathTest(DecoratorsTest):
     def testPathArgsWrong(self):
         pathFunc = decorators.PATH('/path/{identifier}')
         func = pathFunc(self.__setAssertArgs(
-            assertionArgs = self.assertFalse,
+            assertionArgs=self.assertFalse,
             id='anyValue'
         ))
         result = func(self.getResource(path='/path/24'))
@@ -48,8 +48,8 @@ class DecoratorPathTest(DecoratorsTest):
     def testPathArgsValid(self):
         pathFunc = decorators.PATH('/path/{id:[0-9]}')
         func = pathFunc(self.__setAssertArgs(
-            assertionArgs = self.assertTrue,
-            assertionValues = self.assertEqual,
+            assertionArgs=self.assertTrue,
+            assertionValues=self.assertEqual,
             id='24'
         ))
         result = func(self.getResource(path='/path/24'))
@@ -64,14 +64,14 @@ class DecoratorPathTest(DecoratorsTest):
     def testPathMultipleValid(self):
         pathFunc = decorators.PATH('/path/{id:[0-9]}/subPath/{option}')
         func = pathFunc(self.__setAssertArgs(
-            assertionArgs = self.assertTrue,
-            assertionValues = self.assertEqual,
+            assertionArgs=self.assertTrue,
+            assertionValues=self.assertEqual,
             id='24',
             option='value'
         ))
         result = func(self.getResource(path='/path/24/subPath/value'))
         self.assertTrue(result)
-        
+
     def __setAssertArgs(self, assertionArgs=None, assertionValues=None, **expected_args):
         def wrap(self_rest, **result_args):
             for arg_name in expected_args:

@@ -1,7 +1,5 @@
-import unittest
 import json
-
-from mock import MagicMock, Mock
+import unittest
 
 from kaa import GET, PATH, POST, Kaa, KaaError, Resources, Response, Status
 
