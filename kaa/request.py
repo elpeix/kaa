@@ -15,7 +15,8 @@ class Request():
             return query
         for item in query_string.split('&'):
             values = item.split('=')
-            query[values[0]] = values[1]
+            if len(values) == 2:
+                query[values[0]] = values[1]
         return query
 
     def __get_headers(self):
