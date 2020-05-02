@@ -1,12 +1,8 @@
-import json
 import re
 
-from definitions import LOG
 from kaa.authorization import Authorization
-from kaa.enums import ContentType, Status
 from kaa.exceptions import InvalidParamError
 from kaa.request import Request
-from kaa.response import Response
 
 
 def AUTH(auth: Authorization):
