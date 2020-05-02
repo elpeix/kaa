@@ -12,12 +12,12 @@ import kaa
 
 class Kaa():
 
-    def __init__(self, env, start_response, resources:dict={}, request_filters:dict={}, response_filters:dict={}):
+    def __init__(self, env, start_response):
         self.start_response = start_response
         self.request = Request(env)
-        self.resources = resources
-        self.request_filters = request_filters
-        self.response_filters = response_filters
+        self.resources = {}
+        self.request_filters = {}
+        self.response_filters = {}
 
     def register_resources(self, module:str, class_name:str):
         self.__register(self.resources, module, class_name)
@@ -35,7 +35,7 @@ class Kaa():
 
     def serve(self):
         try:
-            self.__requestFilters()
+            self.__request_filters()
             for module_name in self.resources:
                 for class_name in self.resources[module_name]:
                     response:Response = self.__run_resource(module_name, class_name)
@@ -48,7 +48,7 @@ class Kaa():
         except Exception:
             return self.__print_response(Response().server_error(self.request, sys.exc_info()))
 
-    def __requestFilters(self):
+    def __request_filters(self):
         def func(instance:RequestFilter):
             method_ = getattr(instance, 'filter')
             method_(instance, self.request)
