@@ -1,6 +1,6 @@
 import json
 
-from kaa import GET, PATH, ContentType, Request, Response, Status, resources
+from kaa import GET, PATH, Response, Status, resources
 
 
 class Resources(resources.Resources):

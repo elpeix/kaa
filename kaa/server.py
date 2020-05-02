@@ -1,13 +1,13 @@
 import importlib
 import sys
 
-from .enums import ContentType, Status
+import kaa
+
 from .exceptions import KaaError, ResourceNotFoundError
 from .filters import RequestFilter, ResponseFilter
 from .request import Request
 from .resources import Resources
 from .response import Response
-import kaa
 
 
 class Kaa():
