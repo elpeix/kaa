@@ -14,19 +14,11 @@ class Resources(resources.Resources):
         return Response(Status.OK).json(result)
 
     @GET
-    @PATH(
-        url='/resource/{id}/', 
-        query_params={
-            'rparam': {
-                'type': 'str',
-                'required': True
-            },
-            'iparam': {
-                'type': 'int',
-                'default': 42
-            }
-        }
-    )
+    @PATH('/resource/{id}/',
+          query_params={
+              'rparam': {'type': 'str', 'required': True},
+              'iparam': {'type': 'int', 'default': 42}
+          })
     def resource_with_id(self, id, rparam, iparam):
         result = {
             "queryParams": self.request.query,

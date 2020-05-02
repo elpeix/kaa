@@ -100,9 +100,15 @@ class QueryParams:
     def __get_item(self, defined_key, defined_value):
         q_value = self.request.get_query_param(defined_key)
         if q_value:
-            if 'type' in defined_value and defined_value['type'] == 'int':
-                return self.__get_int(defined_key, q_value)
-            return q_value
+            if 'type' not in defined_value:
+                return q_value
+            if defined_value['type'] == 'int':
+                fn = lambda v: int(v)
+            elif defined_value['type'] == 'float':
+                fn = lambda v: float(v)
+            else:
+                return q_value
+            return self.__get_number(defined_key, q_value, fn)
 
         if 'required' in defined_value and defined_value['required']:
             raise InvalidParamError("Param {} is required".format(defined_key))
@@ -110,8 +116,8 @@ class QueryParams:
         if 'default' in defined_value:
             return defined_value['default']
 
-    def __get_int(self, param, value):
+    def __get_number(self, param, value, fn):
         try:
-            return int(value)
+            return fn(value)
         except ValueError:
             raise InvalidParamError("Param {} is not a number".format(param))
