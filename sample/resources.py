@@ -17,15 +17,17 @@ class Resources(resources.Resources):
     @PATH('/resource/{id}/',
           query_params={
               'rparam': {'type': 'str', 'required': True},
-              'iparam': {'type': 'int', 'default': 42}
+              'iparam': {'type': 'int', 'default': 42},
+              'fparam': {'type': 'float', 'default': 1.0}
           })
-    def resource_with_id(self, id, rparam, iparam):
+    def resource_with_id(self, id, rparam, iparam, fparam):
         result = {
             "queryParams": self.request.query,
             "status": "success",
             "id": id,
             "rparam": rparam,
             "iparam": iparam,
+            "fparam": fparam,
             "message": "Get resource /resource/{id}/"
         }
         return Response(Status.OK).json(result)
