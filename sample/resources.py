@@ -1,12 +1,15 @@
 import json
 
-from kaa import GET, PATH, Response, Status, resources
+from kaa import GET, PATH, AUTH, Response, Status, resources
+from .authorization import Auth
 
 
 class Resources(resources.Resources):
 
     @GET
-    @PATH('', query_params={'param': {}})
+    @PATH(url='/', query_params={'param': {
+        'description': 'Basic param'
+    }})
     def base_resource(self, **params):
         result = {
             "message": "Get resource / with params: {}".format(params)
@@ -15,6 +18,10 @@ class Resources(resources.Resources):
 
     @GET
     @PATH('/resource/{id}/',
+          description='Resource with id',
+          path_params={
+              'id': {'type': 'int', 'description': 'Identifier for resource'}
+          },
           query_params={
               'rparam': {'type': 'str', 'required': True},
               'iparam': {'type': 'int', 'default': 42},

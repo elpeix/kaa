@@ -1,7 +1,9 @@
+import json
 import sys
 from wsgiref.simple_server import make_server
 
-from kaa import NAME, VERSION, KaaServer
+from kaa import NAME, VERSION, Kaa, KaaServer
+from kaa.openapi import OpenApi
 from kaa.server import Server
 
 
@@ -25,6 +27,16 @@ class Cli():
         elif subcommand == 'serve':
             self.__serve()
             return
+        elif subcommand == 'openapi':
+            server:KaaServer = Server().get_server()
+            kaa:Kaa = server.get_kaa({
+                'REQUEST_METHOD': '',
+                'PATH_INFO': '',
+                'REMOTE_ADDR': '',
+                'QUERY_STRING': ''
+            }, None)
+
+            msg = json.dumps(OpenApi().generate(kaa))
         else:
             msg = 'Invalid command. Try help'
 
@@ -39,7 +51,8 @@ class Cli():
     def __get_help(self):
         commands = [
             ('version', 'Returns Kaa version'),
-            ('serve', 'Starts a server for development')
+            ('serve', 'Starts a server for development'),
+            ('openapi', 'Generates openapi json')
         ]
         return '\n'.join(['{}\t\t{}'.format(*cmd) for cmd in commands])
 

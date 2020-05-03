@@ -10,6 +10,3 @@ class SampleServer(KaaServer):
         kaa.register_filter_response('sample.filters', 'OnResponse')
         kaa.register_filter_response('sample.filters', 'EnableCors')
         return kaa
-
-    def generate_openapi(self):
-        return dict()

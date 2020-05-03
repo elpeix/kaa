@@ -8,6 +8,7 @@ from .filters import RequestFilter, ResponseFilter
 from .request import Request
 from .resources import Resources
 from .response import Response
+from .openapi import OpenApi
 
 
 class Kaa():
@@ -35,6 +36,9 @@ class Kaa():
 
     def serve(self):
         try:
+            if self.request.path == '/openapi':
+                return self.__print_response(Response().json(OpenApi().generate(self)))
+
             self.__request_filters()
             for module_name in self.resources:
                 for class_name in self.resources[module_name]:
