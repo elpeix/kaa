@@ -43,7 +43,7 @@ def DELETE(func):
     return wrapper
 
 
-def PATH(url, query_params:dict={}):
+def PATH(url, query_params:dict={}, **kwargs):
     def decorator_path(func):
         def wrapper(self):
             request_path = self.request.path.strip("/")
