@@ -9,3 +9,4 @@ NAME = 'Sample Server'
 VERSION = 'v1.0'
 
 SERVER = 'sample.SampleServer'
+ENABLE_CORS = True
