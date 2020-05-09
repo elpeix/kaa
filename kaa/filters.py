@@ -5,10 +5,10 @@ from .response import Response
 class RequestFilter():
 
     def filter(self, request:Request):
-        pass
+        raise NotImplementedError
 
 
 class ResponseFilter():
 
     def filter(self, request:Request, response:Response):
-        pass
+        raise NotImplementedError

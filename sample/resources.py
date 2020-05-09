@@ -43,3 +43,11 @@ class Resources(resources.Resources):
     @PATH('/error')
     def error_resource(self):
         raise Exception("This is an error")
+
+    @GET
+    @PATH('/authorize')
+    @AUTH(Auth())
+    def resource_auth(self):
+        return Response(Status.OK).json({
+            'message': 'authorized'
+        })

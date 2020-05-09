@@ -9,15 +9,24 @@ class Request():
         self.headers = self.__get_headers()
 
     def __get_query(self):
-        query = {}
+        query_params = {}
         query_string = self.env['QUERY_STRING']
         if not query_string:
-            return query
+            return query_params
         for item in query_string.split('&'):
             values = item.split('=')
             if len(values) == 2:
-                query[values[0]] = values[1]
-        return query
+                self.__set_query_value(values[0], values[1], query_params)
+        return query_params
+
+    def __set_query_value(self, key, value, query_params):
+        if key in query_params:
+            if type(query_params[key]) == list:
+                query_params[key].append(value)
+            else:
+                query_params[key] = [query_params[key], value]
+        else:
+            query_params[key] = value
 
     def __get_headers(self):
         headers = {}

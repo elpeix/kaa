@@ -1,8 +1,8 @@
 import re
 
-from kaa.authorization import Authorization
-from kaa.exceptions import InvalidParamError
-from kaa.request import Request
+from .authorization import Authorization
+from .exceptions import InvalidParamError
+from .request import Request
 
 
 def AUTH(auth: Authorization):
