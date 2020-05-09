@@ -9,6 +9,8 @@ from .request import Request
 from .resources import Resources
 from .response import Response
 from .openapi import OpenApi
+from .enums import Status
+from definitions import ENABLE_CORS
 
 
 class Kaa():
@@ -36,8 +38,11 @@ class Kaa():
 
     def serve(self):
         try:
+            if self.request.method == 'OPTIONS':
+                return self.__act_method_options()
+
             if self.request.path == '/openapi':
-                return self.__print_response(Response().json(OpenApi().generate(self)))
+                return self.__get_openapi()
 
             self.__request_filters()
             for module_name in self.resources:
@@ -51,6 +56,23 @@ class Kaa():
             return self.__print_response(e.response())
         except Exception:
             return self.__print_response(Response().server_error(self.request, sys.exc_info()))
+
+    def __get_openapi(self):
+        openapi = OpenApi().generate(self)
+        response = Response()
+        if self.request.get_header('ACCEPT') == 'application/json':
+            response.json(openapi)
+        else:
+            response.yaml(openapi)
+        return self.__print_response(response)
+
+    def __act_method_options(self):
+        if ENABLE_CORS:
+            response = Response(Status.ACCEPTED)
+            self.__response_filters(response)
+        else:
+            response = Response(Status.METHOD_NOT_ALLOWED)
+        return self.__print_response(response.body(''))
 
     def __request_filters(self):
         def func(instance:RequestFilter):

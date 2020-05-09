@@ -1,5 +1,6 @@
 import json
 import traceback
+import yaml
 
 from definitions import DEBUG, LOG
 from kaa.enums import ContentType, Status
@@ -21,6 +22,10 @@ class Response():
     def html(self, html:str):
         self.set_content_type(ContentType.HTML)
         return self.body(json.dumps(html))
+
+    def yaml(self, response:dict):
+        self.set_content_type(ContentType.YAML)
+        return self.body(yaml.dump(response))
 
     def json(self, response:dict):
         self.set_content_type(ContentType.JSON)

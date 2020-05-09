@@ -20,3 +20,4 @@ class ContentType(Enum):
     PLAIN = 'text/plain'
     HTML = 'text/html'
     JSON = 'application/json'
+    YAML = 'application/x-yaml'
