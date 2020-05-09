@@ -8,15 +8,12 @@ import definitions
 
 class OpenApi:
 
+    OPEN_API_VERSION = '3.0.3'
+
     def generate(self, kaa):
-        elements = []
-
-        for module_name in kaa.resources:
-            for class_name in kaa.resources[module_name]:
-                elements.append(self.__fn(module_name, class_name))
-
-        result = {
-            'openapi': '3.0.3',
+        elements = self.__get_elements(kaa)
+        return {
+            'openapi': self.OPEN_API_VERSION,
             'info': {
                 'title': definitions.NAME,
                 'version': definitions.VERSION
@@ -27,27 +24,33 @@ class OpenApi:
             #         'Default': {}
             #     }
             # }
-
         }
-        return result
+
+    def __get_elements(self, kaa):
+        elements = []
+        for module_name in kaa.resources:
+            for class_name in kaa.resources[module_name]:
+                elements.append(self.__fn(module_name, class_name))
+        return elements
 
     def __get_paths(self, elements):
         paths = {}
         for element in elements:
-            for k in element:
-                r = element[k]
+            for operation_id in element:
+                resource = element[operation_id]
                 parameters = []
 
-                if 'path_params' in r:
-                    parameters += (self.__path_params(r['path_params']))
-                if 'query_params' in r:
-                    parameters += (self.__query_params(r['query_params']))
+                if 'path_params' in resource:
+                    parameters += self.__path_params(resource['path_params'])
+                if 'query_params' in resource:
+                    parameters += self.__query_params(resource['query_params'])
 
-                paths[r['url']] = {
-                    r['method'].lower(): {
-                        'operationId': k,
+                method = resource['method'].lower()
+                paths[resource['url']] = {
+                    method: {
+                        'operationId': operation_id,
                         'parameters': parameters,
-                        'description': r['description'] if 'description' in r else '',
+                        'description': self.__get_val(lambda v: v, resource, 'description', ''),
                         'responses': {
                             '200': {
                                 'description': 'Response description',
@@ -70,15 +73,18 @@ class OpenApi:
             parameter = parameters[k]
             p = {
                 'name': k,
-                'description': parameter['description'] if 'description' in parameter else '',
+                'description': self.__get_val(lambda v: v, parameter, 'description', ''),
                 'in': 'path',
                 'schema': {
-                    'type': self.__get_type(parameter['type']) if 'type' in parameter else 'string'
+                    'type': self.__get_val(self.__get_type, parameter, 'type', 'string')
                 },
                 'required': True,
             }
             pm.append(p)
         return pm
+
+    def __get_val(self, fn, item, key, default):
+        return fn(item[key]) if key in item else default
 
     def __query_params(self, parameters):
         pm = []
@@ -86,13 +92,12 @@ class OpenApi:
             parameter = parameters[k]
             p = {
                 'name': k,
-                'description': parameter['description'] if 'description' in parameter else '',
+                'description': self.__get_val(lambda v: v, parameter, 'description', ''),
                 'in': 'query',
                 'schema': {
-                    'type': self.__get_type(parameter['type']) if 'type' in parameter else 'string'
+                    'type': self.__get_val(self.__get_type, parameter, 'type', 'string')
                 },
-                # 'default': parameter['default'] if 'default' in parameter else '',
-                'required': parameter['required'] if 'required' in parameter else False,
+                'required': self.__get_val(lambda v: v, parameter, 'required', False),
             }
             pm.append(p)
         return pm
@@ -112,7 +117,7 @@ def get_decorators(cls):
     target = cls
     decorators = {}
 
-    def visit_FunctionDef(node):
+    def visit_fn(node):
         if node.name[:2] == "__":
             return
         decorators[node.name] = {}
@@ -129,67 +134,70 @@ def get_decorators(cls):
                     decorators[node.name]['method'] = name
 
     node_iter = ast.NodeVisitor()
-    node_iter.visit_FunctionDef = visit_FunctionDef
+    node_iter.visit_FunctionDef = visit_fn
     node_iter.visit(ast.parse(inspect.getsource(target)))
     return decorators
 
 
 def parse_path(node):
-    res = {}
+    result = {}
 
     def _parse(node):
         if isinstance(node, ast.AST):
             fields = [(a, b) for a, b in ast.iter_fields(node)]
             for field in fields:
                 if field[0] == 'args':
-                    res.update(_parse_args(field[1]))
+                    result.update(_parse_args(field[1]))
                 elif field[0] == 'keywords':
-                    res.update(_parse_kw(field[1]))
+                    result.update(_parse_kw(field[1]))
                 elif isinstance(field[1], ast.AST):
                     _parse(field[1])
 
     def _parse_args(node):
         if not isinstance(node, list):
             return {}
-        args = {}
+        childs = {}
         count = 0
-        for arg in node:
+        for child in node:
             count += 1
             if count == 1:
-                args['url'] = [b for a, b in ast.iter_fields(arg)][0]
+                childs['url'] = _get_iter_fields(child)[0]
             if count == 2:
-                args['query_params'] = _parse_dict(arg)
-        return args
+                childs['query_params'] = _parse_dict(child)
+        return childs
 
     def _parse_kw(node):
-        args = {}
-        for arg in node:
-            a = [b for a, b in ast.iter_fields(arg)]
-            args[a[0]] = _parse_dict(a[1])
-        return args
+        childs = {}
+        for child in node:
+            fields = _get_iter_fields(child)
+            childs[fields[0]] = _parse_dict(fields[1])
+        return childs
 
     def _parse_dict(node):
         params = []
         values = []
-        for a, b in ast.iter_fields(node):
-            if a == 'keys':
-                for k in b:
-                    params += [d for c, d in ast.iter_fields(k)]
-            elif a == 'values':
-                for k in b:
-                    flds = [d for c, d in ast.iter_fields(k)]
-                    if len(flds) == 1:
-                        values.append(flds[0])
-                        continue
-                    values.append(_parse_dict(k))
+        for field_key, field_value in ast.iter_fields(node):
+            if field_key == 'keys':
+                for k in field_value:
+                    params += _get_iter_fields(k)
+            elif field_key == 'values':
+                for k in field_value:
+                    fields = _get_iter_fields(k)
+                    if len(fields) == 1:
+                        values.append(fields[0])
+                    else:
+                        values.append(_parse_dict(k))
             else:
-                return b
-        c = 0
+                return field_value
+        idx = 0
         result = {}
         for param in params:
-            result[param] = values[c]
-            c += 1
+            result[param] = values[idx]
+            idx += 1
         return result
 
+    def _get_iter_fields(node):
+        return [v for k, v in ast.iter_fields(node)]
+
     _parse(node)
-    return res
+    return result
