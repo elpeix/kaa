@@ -1,7 +1,8 @@
 import json
 import unittest
 
-from kaa import GET, PATH, POST, Kaa, KaaError, Resources, Response, Status
+from kaa import (AUTH, GET, PATH, POST, Authorization, Kaa, KaaError, Request,
+                 Resources, Response, Status)
 
 
 class ResourcesTest(unittest.TestCase):
@@ -58,18 +59,44 @@ class ResourcesTest(unittest.TestCase):
             start_response=lambda status_code, headers: self.assertEqual(status_code, Status.SERVER_ERROR.value[1])
         )
 
-    def __run_kaa(self, method='GET', path='', q='', start_response=None):
+    def test_authorize_forbidden(self):
+        self.__run_kaa(
+            method='GET',
+            path='/authorize',
+            headers={'authorization': 'wrong_token'},
+            start_response=lambda status_code, headers: self.assertEqual(status_code, Status.FORBIDDEN.value[1])
+        )
+
+    def test_authorize_ok(self):
+        self.__run_kaa(
+            method='GET',
+            path='/authorize',
+            headers={'authorization': 'valid_token'},
+            start_response=lambda status_code, headers: self.assertEqual(status_code, Status.OK.value[1])
+        )
+
+    def __run_kaa(self, method='GET', path='', q='', headers={}, start_response=None):
         env = {
             'REQUEST_METHOD': method,
             'PATH_INFO': path,
             'REMOTE_ADDR': '127.0.0.1',
             'QUERY_STRING': q
         }
+        for header in headers:
+            env['HTTP_' + header.upper()] = headers[header]
         if start_response is None:
             start_response = lambda status_code, headers: print(status_code)
         kaa = Kaa(env, start_response)
         kaa.register_resources('test.resources_test', 'ResourcesFake')
         return kaa.serve()
+
+
+class AuthFake(Authorization):
+
+    def authorize(self, request:Request):
+        if request.get_header('AUTHORIZATION') == 'valid_token':
+            return True
+        return False
 
 
 class ResourcesFake(Resources):
@@ -97,3 +124,11 @@ class ResourcesFake(Resources):
     @PATH('/error')
     def error_resource(self):
         raise KaaError("anyError")
+
+    @GET
+    @PATH('/authorize')
+    @AUTH(AuthFake())
+    def resource_auth(self):
+        return Response(Status.OK).json({
+            'message': 'authorized'
+        })

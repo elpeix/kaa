@@ -1,11 +1,11 @@
-from kaa.request import Request
-from kaa.response import Response
+from .request import Request
+from .response import Response
 
 
 class Authorization:
 
     def authorize(self, request:Request):
-        pass
+        raise NotImplementedError
 
     def forbidden(self, request:Request):
         return Response().forbidden(request)
