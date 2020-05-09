@@ -14,3 +14,8 @@ Start with diferent host and port:
 ```
 $ python kaa.py serve host:port
 ```
+
+### Requirements
+
+- pyYaml for OpenApi output
+- Mock for testing
