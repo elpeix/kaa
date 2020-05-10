@@ -2,9 +2,9 @@ import json
 import sys
 from wsgiref.simple_server import make_server
 
-from kaa import NAME, VERSION, Kaa, KaaServer
-from kaa.openapi import OpenApi
-from kaa.server import Server
+from . import NAME, VERSION, Kaa, KaaServer
+from .openapi import OpenApi
+from .server import Server
 
 
 class Cli():
