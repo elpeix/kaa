@@ -87,7 +87,7 @@ class ResourcesTest(unittest.TestCase):
         if start_response is None:
             start_response = lambda status_code, headers: print(status_code)
         kaa = Kaa(env, start_response)
-        kaa.register_resources('test.resources_test', 'ResourcesFake')
+        kaa.register_resources('test.kaa.resources_test', 'ResourcesFake')
         return kaa.serve()
 
 
