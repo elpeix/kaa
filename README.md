@@ -1,5 +1,5 @@
 # Kaa
-A very simple python server framework from REST applications.
+A very simple python server framework for REST applications.
 
 ## Starting
 
