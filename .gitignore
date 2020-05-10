@@ -7,3 +7,4 @@ __pycache__/
 *.log
 *.pyc
 setup.py
+.DS_Store
