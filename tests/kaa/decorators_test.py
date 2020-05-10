@@ -1,12 +1,11 @@
 import unittest
 
-from kaa.request import Request
-from kaa.resources import Resources
+from kaa import Request, Resources
 
 
 class DecoratorsTest(unittest.TestCase):
 
-    def getResource(self, method='', path='path', q=''):
+    def get_resource(self, method='', path='path', q=''):
         request = Request({
             'REQUEST_METHOD': method,
             'PATH_INFO': path,
