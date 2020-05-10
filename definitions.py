@@ -8,5 +8,5 @@ LOG = logging.getLogger()
 NAME = 'Sample Server'
 VERSION = 'v1.0'
 
-SERVER = 'sample.SampleServer'
+SERVER = 'example.SampleServer'
 ENABLE_CORS = True
