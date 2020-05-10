@@ -6,7 +6,12 @@ A very simple python server framework for REST applications.
 ### Requirements
 
 - pyYaml for OpenApi output
-- Mock for testing
+
+### Install
+
+```bash
+pip install kaa-rest-server
+```
 
 ### Main files
 
