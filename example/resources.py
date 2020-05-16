@@ -7,7 +7,7 @@ from .authorization import Auth
 class Resources(resources.Resources):
 
     @GET
-    @PATH(url='/', query_params={'param': {
+    @PATH(uri='/', query_params={'param': {
         'description': 'Basic param'
     }})
     def base_resource(self, **params):

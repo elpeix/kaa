@@ -46,7 +46,7 @@ class OpenApi:
                     parameters += self.__query_params(resource['query_params'])
 
                 method = resource['method'].lower()
-                paths[resource['url']] = {
+                paths[resource['uri']] = {
                     method: {
                         'operationId': operation_id,
                         'parameters': parameters,
@@ -161,7 +161,7 @@ def parse_path(node):
         for child in node:
             count += 1
             if count == 1:
-                childs['url'] = _get_iter_fields(child)[0]
+                childs['uri'] = _get_iter_fields(child)[0]
             if count == 2:
                 childs['query_params'] = _parse_dict(child)
         return childs
