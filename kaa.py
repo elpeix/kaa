@@ -1,6 +1,3 @@
-
-import importlib
-
 from kaa.cli import Cli, Server
 
 

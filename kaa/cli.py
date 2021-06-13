@@ -21,7 +21,7 @@ class Cli():
             subcommand = 'help'
 
         if subcommand == 'version':
-            msg = self.__get_version
+            msg = self.__get_version()
         elif subcommand == 'help':
             msg = self.__get_help()
         elif subcommand == 'serve':
