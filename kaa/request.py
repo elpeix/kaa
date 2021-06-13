@@ -1,3 +1,6 @@
+import json
+
+
 class Request():
 
     def __init__(self, env):
@@ -5,6 +8,7 @@ class Request():
         self.method = self.env['REQUEST_METHOD']
         self.path = self.env['PATH_INFO']
         self.remote_addr = self.env['REMOTE_ADDR']
+        self.content_type = self.env['CONTENT_TYPE']
         self.query = self.__get_query()
         self.headers = self.__get_headers()
 
@@ -53,3 +57,12 @@ class Request():
             'query': self.query,
             'headers': self.headers
         }
+
+    def get_request_body(self):
+        if self.content_type and self.content_type == 'application/json':
+            try:
+                length = int(self.env.get('CONTENT_LENGTH', '0'))
+                return json.loads(self.env['wsgi.input'].read(length))
+            except ValueError:
+                return {}
+        return {}
