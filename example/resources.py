@@ -1,6 +1,7 @@
 import json
 
-from kaa import GET, PATH, AUTH, Response, Status, resources
+from kaa import AUTH, GET, PATH, POST, Response, Status, request, resources
+
 from .authorization import Auth
 
 
@@ -50,4 +51,12 @@ class Resources(resources.Resources):
     def resource_auth(self):
         return Response(Status.OK).json({
             'message': 'authorized'
+        })
+
+    @POST
+    @PATH('/sendData')
+    def resource_send(self):
+        request_body = self.request.get_request_body()
+        return Response(Status.OK).json({
+            'data': request_body
         })

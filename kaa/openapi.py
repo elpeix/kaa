@@ -192,8 +192,12 @@ def parse_path(node):
         idx = 0
         result = {}
         for param in params:
-            result[param] = values[idx]
-            idx += 1
+            """
+                TODO: index range issue
+            """
+            if param:
+                result[param] = values[idx]
+                idx += 1
         return result
 
     def _get_iter_fields(node):
