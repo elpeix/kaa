@@ -3,10 +3,10 @@ from kaa import Kaa, KaaServer
 
 class SampleServer(KaaServer):
 
-    def get_kaa(self) -> Kaa:
-        kaa = Kaa()
-        kaa.register_resources('example.resources', 'Resources')
-        kaa.register_filter_request('example.filters', 'OnRequest')
-        kaa.register_filter_response('example.filters', 'OnResponse')
-        kaa.register_filter_response('example.filters', 'EnableCors')
-        return kaa
+    def register_resources(self):
+        self.kaa.register_resources('example.resources', 'Resources')
+
+    def register_filters(self):
+        self.kaa.register_filter_request('example.filters', 'OnRequest')
+        self.kaa.register_filter_response('example.filters', 'OnResponse')
+        self.kaa.register_filter_response('example.filters', 'EnableCors')
