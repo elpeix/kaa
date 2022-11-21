@@ -94,9 +94,7 @@ You can use **uswgi** or similar and call application method.
 
 ## Application
 
-This class initializes Kaa for each http request. 
-
-Method *get_kaa* must return a **Kaa** object. With **Kaa** object you can register resources and filters:
+This class initializes Kaa for each http request. (Cli uses one object)
 
 #### Register resources
 
@@ -118,11 +116,9 @@ This method registers classes with response filters. Each response it will pass 
 from kaa import Kaa, KaaServer
 
 class Server(KaaServer):
-
-    def get_kaa(self, env, start_response) -> Kaa:
-        kaa = Kaa(env, start_response)
-        kaa.register_resources('app', 'AppResources')
-        return kaa
+    
+    def register_resources(self):
+        self.kaa.register_resources('app', 'appResources')
 
 ```
 
