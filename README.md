@@ -66,10 +66,8 @@ from kaa import Kaa, KaaServer
 
 class Server(KaaServer):
 
-    def get_kaa(self, env, start_response) -> Kaa:
-        kaa = Kaa(env, start_response)
-        kaa.register_resources('app', 'AppResources')
-        return kaa
+    def register_resources(self):
+        self.kaa.register_resources('app', 'AppResources')
 
 ```
 
