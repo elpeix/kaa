@@ -13,6 +13,7 @@ class Cli():
         self.host = '127.0.0.1'
         self.port = 8086
         self.argv = sys.argv[:]
+        self.server:KaaServer = None
 
     def execute(self):
         try:
@@ -27,32 +28,23 @@ class Cli():
         elif subcommand == 'serve':
             self.__serve()
             return
-        elif subcommand == 'openapi':
-            server:KaaServer = Server().get_server()
-            kaa:Kaa = server.get_kaa({
-                'REQUEST_METHOD': '',
-                'PATH_INFO': '',
-                'REMOTE_ADDR': '',
-                'QUERY_STRING': ''
-            }, None)
-
-            msg = json.dumps(OpenApi().generate(kaa))
         else:
             msg = 'Invalid command. Try help'
 
         sys.stdout.write(msg + '\n')
 
-    def __get_name(self):
+    @classmethod
+    def __get_name(cls):
         return NAME
 
-    def __get_version(self):
+    @classmethod
+    def __get_version(cls):
         return VERSION
 
     def __get_help(self):
         commands = [
             ('version', 'Returns Kaa version'),
-            ('serve', 'Starts a server for development'),
-            ('openapi', 'Generates openapi json')
+            ('serve', 'Starts a server for development')
         ]
         return '\n'.join(['{}\t\t{}'.format(*cmd) for cmd in commands])
 
@@ -60,11 +52,12 @@ class Cli():
         self.__set_host_port()
         sys.stdout.write('{} version {}\n'.format(self.__get_name(), self.__get_version()))
         sys.stdout.write('Server started at {}:{}\n\n'.format(self.host, self.port))
-        server:KaaServer = Server().get_server()
+        if self.server is None:
+            self.server = Server().get_server()
         make_server(
             host=self.host,
             port=int(self.port),
-            app=lambda env, start_response: server.get_kaa(env, start_response).serve()
+            app=lambda env, start_response: self.server.serve(env, start_response)
         ).serve_forever()
 
     def __set_host_port(self):
