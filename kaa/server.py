@@ -5,14 +5,16 @@ from kaa import KaaServer
 
 class Server:
 
-    def get_server(self) -> KaaServer:
+    def __init__(self) -> None:
         spl = SERVER.split('.')
         class_name = spl[-1]
         module_name = '.'.join(spl[:-1])
         module = importlib.import_module(module_name)
         class_ = getattr(module, class_name)
-        return class_()
+        self.server = class_()
+
+    def get_server(self) -> KaaServer:
+        return self.server
 
     def serve(self, env, start_response):
-        server:KaaServer = self.get_server()
-        return server.serve(env, start_response)
+        return self.server.serve(env, start_response)

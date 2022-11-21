@@ -15,12 +15,11 @@ from .response import Response
 
 class Kaa():
 
-    def __init__(self, env, start_response):
-        self.start_response = start_response
-        self.request = Request(env)
+    def __init__(self):
         self.resources = {}
         self.request_filters = {}
         self.response_filters = {}
+        self.openapi = None
 
     def register_resources(self, module:str, class_name:str):
         self.__register(self.resources, module, class_name)
@@ -36,54 +35,58 @@ class Kaa():
             element[module] = []
         element[module].append(class_name)
 
-    def serve(self):
+    def serve(self, env, start_response):
+        self.start_response = start_response
+        request = Request(env)
+
         try:
-            if self.request.method == 'OPTIONS':
-                return self.__act_method_options()
+            if request.method == 'OPTIONS':
+                return self.__act_method_options(request)
 
-            if self.request.path == '/openapi':
-                return self.__get_openapi()
+            if request.path == '/openapi':
+                return self.__get_openapi(request)
 
-            self.__request_filters()
+            self.__request_filters(request)
             for module_name in self.resources:
                 for class_name in self.resources[module_name]:
-                    response:Response = self.__run_resource(module_name, class_name)
+                    response:Response = self.__run_resource(request, module_name, class_name)
                     if response:
-                        self.__response_filters(response)
+                        self.__response_filters(request, response)
                         return self.__print_response(response)
             raise ResourceNotFoundError()
         except KaaError as e:
             return self.__print_response(e.response())
         except Exception:
-            return self.__print_response(Response().server_error(self.request, sys.exc_info()))
+            return self.__print_response(Response().server_error(request, sys.exc_info()))
 
-    def __get_openapi(self):
-        openapi = OpenApi().generate(self)
+    def __get_openapi(self, request:Request):
+        if self.openapi is None:
+            self.openapi = OpenApi().generate(self)
         response = Response()
-        if self.request.get_header('ACCEPT') == 'application/json':
-            response.json(openapi)
+        if request.get_header('ACCEPT') == 'application/json':
+            response.json(self.openapi)
         else:
-            response.yaml(openapi)
+            response.yaml(self.openapi)
         return self.__print_response(response)
 
-    def __act_method_options(self):
+    def __act_method_options(self, request:Request):
         if ENABLE_CORS:
             response = Response(Status.ACCEPTED)
-            self.__response_filters(response)
+            self.__response_filters(request, response)
         else:
             response = Response(Status.METHOD_NOT_ALLOWED)
         return self.__print_response(response.body(''))
 
-    def __request_filters(self):
+    def __request_filters(self, request:Request):
         def func(instance:RequestFilter):
             method_ = getattr(instance, 'filter')
-            method_(instance, self.request)
+            method_(instance, request)
         self.__call_filters(self.request_filters, func)
 
-    def __response_filters(self, response:Response):
+    def __response_filters(self, request:Request, response:Response):
         def func(instance:ResponseFilter):
             method_ = getattr(instance, 'filter')
-            method_(instance, self.request, response)
+            method_(instance, request, response)
         self.__call_filters(self.response_filters, func)
 
     def __call_filters(self, filters, func):
@@ -91,9 +94,9 @@ class Kaa():
             for class_name in filters[module_name]:
                 func(self.__get_class(module_name, class_name))
 
-    def __run_resource(self, module_name, class_name) -> Response:
+    def __run_resource(self, request:Request, module_name, class_name) -> Response:
         class_ = self.__get_class(module_name, class_name)
-        instance:Resources = class_(self.request)
+        instance:Resources = class_(request)
         for method_name in dir(class_):
             count = 1 + len(class_name) + 2
             if method_name[:2] == "__" or method_name[:count] == "_{}__".format(class_name):

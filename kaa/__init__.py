@@ -9,16 +9,22 @@ from .resources import Resources
 from .response import Response
 
 NAME = 'KAA'
-VERSION = '0.1'
+VERSION = '0.2.0'
 
 
 class KaaServer:
 
-    def get_kaa(self, env, start_response):
-        pass
+    def __init__(self) -> None:
+        self.kaa = self.get_kaa()
+
+    def get_kaa(self) -> Kaa:
+        return None
 
     def serve(self, env, start_response):
-        return self.get_kaa(env, start_response).serve()
+        if self.kaa is None:
+            raise KaaError('Kaa is not defined')
+
+        return self.kaa.serve(env, start_response)
 
     def generate_openapi(self):
         pass
