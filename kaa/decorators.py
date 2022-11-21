@@ -57,7 +57,7 @@ def PATH(uri, query_params:dict={}, **kwargs):
             split_request_path = request_path.split('/')
             split_defined_path = defined_path.split('/')
 
-            if (len(split_request_path) != len(split_defined_path)):
+            if len(split_request_path) != len(split_defined_path):
                 return
 
             regexp = r'^\{([a-z_][a-zA-Z0-9_]+)(:[^}]+){0,1}\}$'
@@ -99,21 +99,21 @@ class QueryParams:
             if 'type' not in defined_value:
                 return q_value
             if defined_value['type'] == 'int':
-                fn = lambda v: int(v)
+                func = lambda v: int(v)
             elif defined_value['type'] == 'float':
-                fn = lambda v: float(v)
+                func = lambda v: float(v)
             else:
                 return q_value
-            return self.__get_number(defined_key, q_value, fn)
+            return self.__get_number(defined_key, q_value, func)
 
         if 'required' in defined_value and defined_value['required']:
-            raise InvalidParamError("Param {} is required".format(defined_key))
+            raise InvalidParamError(f"Param {defined_key} is required")
 
         if 'default' in defined_value:
             return defined_value['default']
 
-    def __get_number(self, param, value, fn):
+    def __get_number(self, param, value, func):
         try:
-            return fn(value)
-        except ValueError:
-            raise InvalidParamError("Param {} is not a number".format(param))
+            return func(value)
+        except ValueError as error:
+            raise InvalidParamError(f"Param {param} is not a number", error)
