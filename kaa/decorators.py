@@ -36,6 +36,13 @@ def PUT(func):
     return wrapper
 
 
+def PATCH(func):
+    def wrapper(self, **kwargs):
+        if self.request.method == 'PATCH':
+            return func(self, **kwargs)
+    return wrapper
+
+
 def DELETE(func):
     def wrapper(self, **kwargs):
         if self.request.method == 'DELETE':

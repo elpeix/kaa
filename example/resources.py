@@ -1,6 +1,7 @@
 import json
 
-from kaa import AUTH, GET, PATH, POST, Response, Status, request, resources
+from kaa import (AUTH, DELETE, GET, PATCH, PATH, POST, PUT, Response, Status,
+                 resources)
 
 from .authorization import Auth
 
@@ -8,9 +9,7 @@ from .authorization import Auth
 class Resources(resources.Resources):
 
     @GET
-    @PATH(uri='/', query_params={'param': {
-        'description': 'Basic param'
-    }})
+    @PATH(uri='/', query_params={'param': {'description': 'Basic param'}})
     def base_resource(self, **params):
         result = {
             "message": "Get resource / with params: {}".format(params)
@@ -54,9 +53,37 @@ class Resources(resources.Resources):
         })
 
     @POST
-    @PATH('/sendData')
-    def resource_send(self):
+    @PATH('/doPost')
+    def resource_post(self):
         request_body = self.request.get_request_body()
         return Response(Status.OK).json({
+            'message': 'posted',
             'data': request_body
+        })
+
+    @PATCH
+    @PATH('/doPatch')
+    def resource_patch(self):
+        request_body = self.request.get_request_body()
+        return Response(Status.OK).json({
+            'message': 'patched',
+            'data': request_body
+        })
+    
+    @PUT
+    @PATH('/doPut/{id}/')
+    def resource_put(self, id):
+        request_body = self.request.get_request_body()
+        return Response(Status.OK).json({
+            'message': 'put',
+            'id': id,
+            'data': request_body
+        })
+
+    @DELETE
+    @PATH('/doDelete/{id}/')
+    def resource_delete(self, id):
+        return Response(Status.OK).json({
+            'message': 'deleted',
+            'id': id
         })
