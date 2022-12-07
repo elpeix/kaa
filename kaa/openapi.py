@@ -111,7 +111,7 @@ class OpenApi:
 
 
 def get_decorators(cls):
-    AVAILABLE_METHODS = ['GET', 'PUT', 'POST', 'DELETE']
+    AVAILABLE_METHODS = ['GET', 'PUT', 'POST', 'PATCH', 'DELETE']
     PATH = 'PATH'
     AUTH = 'AUTH'
     target = cls

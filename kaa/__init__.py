@@ -1,5 +1,5 @@
 from .authorization import Authorization
-from .decorators import AUTH, GET, PATH, POST, PUT, DELETE
+from .decorators import AUTH, GET, PATH, PATCH, POST, PATCH, PUT, DELETE
 from .enums import ContentType, Status
 from .exceptions import *
 from .filters import RequestFilter, ResponseFilter

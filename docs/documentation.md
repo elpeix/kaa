@@ -255,6 +255,7 @@ HTTP methods with decorator. They don't have arguments.
 - **GET**
 - **PUT**
 - **POST**
+- **PATCH**
 - **DELETE**
 
 #### Authorization
