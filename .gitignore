@@ -1,4 +1,5 @@
 env/
+.venv/
 dist/
 build/
 kaa_rest_server.egg-info/
