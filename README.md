@@ -25,7 +25,7 @@ import logging
 
 NAME = 'Simple kaa Server'  # Your project name
 VERSION = 'v1.0'  # Version 
-SERVER = 'app.Server'  # Module and main class
+SERVER = 'server.Server'  # Module and main class
 
 LOG = logging.getLogger()
 DEBUG = True
@@ -33,9 +33,9 @@ ENABLE_CORS = False
 
 ```
 
-#### Server file
+#### Application file
 
-Requires a simple file to start server (kaa.py)
+Requires a simple file to start server (app.py)
 
 ```python
 import importlib
@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
 #### Main classes
 
-(file app.py)
+(file server.py)
 
 This class initializes Kaa for each http request
 
