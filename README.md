@@ -91,12 +91,12 @@ class AppResources(Resources):
 
 ### Starting server
 ```
-$ python kaa.py serve
+$ python app.py serve
 ```
 
 By default host is 127.0.0.1 and port is 8086
 
 Start with diferent host and port:
 ```
-$ python kaa.py serve host:port
+$ python app.py serve host:port
 ```
