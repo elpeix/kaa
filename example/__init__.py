@@ -1,1 +1,1 @@
-from .server import SampleServer
+from .server import SampleServer  # noqa

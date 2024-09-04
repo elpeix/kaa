@@ -1,4 +1,3 @@
-
 import ast
 import importlib
 import inspect
@@ -7,18 +6,14 @@ import definitions
 
 
 class OpenApi:
-
-    OPEN_API_VERSION = '3.0.3'
+    OPEN_API_VERSION = "3.0.3"
 
     def generate(self, kaa):
         elements = self.__get_elements(kaa)
         return {
-            'openapi': self.OPEN_API_VERSION,
-            'info': {
-                'title': definitions.NAME,
-                'version': definitions.VERSION
-            },
-            'paths': self.__get_paths(elements),
+            "openapi": self.OPEN_API_VERSION,
+            "info": {"title": definitions.NAME, "version": definitions.VERSION},
+            "paths": self.__get_paths(elements),
             # 'components': {
             #     'schemas': {
             #         'Default': {}
@@ -40,24 +35,26 @@ class OpenApi:
                 resource = element[operation_id]
                 parameters = []
 
-                if 'path_params' in resource:
-                    parameters += self.__path_params(resource['path_params'])
-                if 'query_params' in resource:
-                    parameters += self.__query_params(resource['query_params'])
+                if "path_params" in resource:
+                    parameters += self.__path_params(resource["path_params"])
+                if "query_params" in resource:
+                    parameters += self.__query_params(resource["query_params"])
 
-                method = resource['method'].lower()
-                paths[resource['uri']] = {
+                method = resource["method"].lower()
+                paths[resource["uri"]] = {
                     method: {
-                        'operationId': operation_id,
-                        'parameters': parameters,
-                        'description': self.__get_val(lambda v: v, resource, 'description', ''),
-                        'responses': {
-                            '200': {
-                                'description': 'Response description',
-                                'content': {'application/json':{}},
+                        "operationId": operation_id,
+                        "parameters": parameters,
+                        "description": self.__get_val(
+                            lambda v: v, resource, "description", ""
+                        ),
+                        "responses": {
+                            "200": {
+                                "description": "Response description",
+                                "content": {"application/json": {}},
                                 # '$ref': '#/components/schemas/Default'
                             }
-                        }
+                        },
                     }
                 }
         return paths
@@ -72,13 +69,15 @@ class OpenApi:
         for k in parameters:
             parameter = parameters[k]
             p = {
-                'name': k,
-                'description': self.__get_val(lambda v: v, parameter, 'description', ''),
-                'in': 'path',
-                'schema': {
-                    'type': self.__get_val(self.__get_type, parameter, 'type', 'string')
+                "name": k,
+                "description": self.__get_val(
+                    lambda v: v, parameter, "description", ""
+                ),
+                "in": "path",
+                "schema": {
+                    "type": self.__get_val(self.__get_type, parameter, "type", "string")
                 },
-                'required': True,
+                "required": True,
             }
             pm.append(p)
         return pm
@@ -91,29 +90,31 @@ class OpenApi:
         for k in parameters:
             parameter = parameters[k]
             p = {
-                'name': k,
-                'description': self.__get_val(lambda v: v, parameter, 'description', ''),
-                'in': 'query',
-                'schema': {
-                    'type': self.__get_val(self.__get_type, parameter, 'type', 'string')
+                "name": k,
+                "description": self.__get_val(
+                    lambda v: v, parameter, "description", ""
+                ),
+                "in": "query",
+                "schema": {
+                    "type": self.__get_val(self.__get_type, parameter, "type", "string")
                 },
-                'required': self.__get_val(lambda v: v, parameter, 'required', False),
+                "required": self.__get_val(lambda v: v, parameter, "required", False),
             }
             pm.append(p)
         return pm
 
     def __get_type(self, param_type):
-        if param_type == 'int':
-            return 'integer'
-        elif param_type == 'float':
-            return 'number'
-        return 'string'
+        if param_type == "int":
+            return "integer"
+        elif param_type == "float":
+            return "number"
+        return "string"
 
 
 def get_decorators(cls):
-    AVAILABLE_METHODS = ['GET', 'PUT', 'POST', 'PATCH', 'DELETE']
-    PATH = 'PATH'
-    AUTH = 'AUTH'
+    AVAILABLE_METHODS = ["GET", "PUT", "POST", "PATCH", "DELETE"]
+    PATH = "PATH"
+    AUTH = "AUTH"
     target = cls
     decorators = {}
 
@@ -127,11 +128,11 @@ def get_decorators(cls):
                 if name == PATH:
                     decorators[node.name].update(parse_path(n))
                 elif name == AUTH:
-                    decorators[node.name]['authorization'] = True
+                    decorators[node.name]["authorization"] = True
             else:
                 name = n.attr if isinstance(n, ast.Attribute) else n.id
                 if name in AVAILABLE_METHODS:
-                    decorators[node.name]['method'] = name
+                    decorators[node.name]["method"] = name
 
     node_iter = ast.NodeVisitor()
     node_iter.visit_FunctionDef = visit_fn
@@ -146,9 +147,9 @@ def parse_path(node):
         if isinstance(node, ast.AST):
             fields = [(a, b) for a, b in ast.iter_fields(node)]
             for field in fields:
-                if field[0] == 'args':
+                if field[0] == "args":
                     result.update(_parse_args(field[1]))
-                elif field[0] == 'keywords':
+                elif field[0] == "keywords":
                     result.update(_parse_kw(field[1]))
                 elif isinstance(field[1], ast.AST):
                     _parse(field[1])
@@ -161,9 +162,9 @@ def parse_path(node):
         for child in node:
             count += 1
             if count == 1:
-                childs['uri'] = _get_iter_fields(child)[0]
+                childs["uri"] = _get_iter_fields(child)[0]
             if count == 2:
-                childs['query_params'] = _parse_dict(child)
+                childs["query_params"] = _parse_dict(child)
         return childs
 
     def _parse_kw(node):
@@ -177,10 +178,10 @@ def parse_path(node):
         params = []
         values = []
         for field_key, field_value in ast.iter_fields(node):
-            if field_key == 'keys':
+            if field_key == "keys":
                 for k in field_value:
                     params += _get_iter_fields(k)
-            elif field_key == 'values':
+            elif field_key == "values":
                 for k in field_value:
                     fields = _get_iter_fields(k)
                     if len(fields) == 1:

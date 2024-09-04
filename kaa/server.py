@@ -4,11 +4,10 @@ from kaa import KaaServer
 
 
 class Server:
-
     def __init__(self) -> None:
-        spl = SERVER.split('.')
+        spl = SERVER.split(".")
         class_name = spl[-1]
-        module_name = '.'.join(spl[:-1])
+        module_name = ".".join(spl[:-1])
         module = importlib.import_module(module_name)
         class_ = getattr(module, class_name)
         self.server = class_()
