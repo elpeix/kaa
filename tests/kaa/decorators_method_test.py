@@ -6,37 +6,36 @@ from .decorators_test import DecoratorsTest
 
 
 class DecoratorsMethodTest(DecoratorsTest):
-
     def test_get_wrong(self):
-        response = self.__test_method(GET, 'POST')
+        response = self.__test_method(GET, "POST")
         self.assertIsNone(response)
 
     def test_get_valid(self):
-        response = self.__test_method(GET, 'GET')
+        response = self.__test_method(GET, "GET")
         self.assertIsNotNone(response)
 
     def test_post_wrong(self):
-        response = self.__test_method(POST, 'GET')
+        response = self.__test_method(POST, "GET")
         self.assertIsNone(response)
 
     def test_post_valid(self):
-        response = self.__test_method(POST, 'POST')
+        response = self.__test_method(POST, "POST")
         self.assertIsNotNone(response)
 
     def test_put_wrong(self):
-        response = self.__test_method(PUT, 'GET')
+        response = self.__test_method(PUT, "GET")
         self.assertIsNone(response)
 
     def test_put_valid(self):
-        response = self.__test_method(PUT, 'PUT')
+        response = self.__test_method(PUT, "PUT")
         self.assertIsNotNone(response)
 
     def test_delete_wrong(self):
-        response = self.__test_method(DELETE, 'GET')
+        response = self.__test_method(DELETE, "GET")
         self.assertIsNone(response)
 
     def test_delet_valid(self):
-        response = self.__test_method(DELETE, 'DELETE')
+        response = self.__test_method(DELETE, "DELETE")
         self.assertIsNotNone(response)
 
     def __test_method(self, decorator, method):
