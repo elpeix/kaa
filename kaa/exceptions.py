@@ -20,10 +20,8 @@ class KaaError(Exception):
 
     def __str__(self):
         if self.err is None:
-            return "{status} - {msg}".format(status=self.status.value[1], msg=self.msg)
-        return "{status} - {msg} - {err}".format(
-            status=self.status.value[1], msg=self.msg, err=repr(self.err)
-        )
+            return f"{self.status.value[1]} - {self.msg}"
+        return f"{self.status.value[1]} - {self.msg} - {self.err}"
 
 
 class NotFoundError(KaaError):

@@ -137,4 +137,5 @@ class QueryParams:
         try:
             return func(value)
         except ValueError as error:
-            raise InvalidParamError(f"Param {param} is not a number", error)
+            raise InvalidParamError(
+                f"Param {param} is not a number", error) from error

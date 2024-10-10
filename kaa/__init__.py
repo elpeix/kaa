@@ -1,5 +1,5 @@
 from .authorization import Authorization  # noqa
-from .decorators import AUTH, GET, PATH, PATCH, POST, PATCH, PUT, DELETE  # noqa
+from .decorators import AUTH, GET, PATH, POST, PATCH, PUT, DELETE  # noqa
 from .enums import ContentType, Status  # noqa
 from .exceptions import (
     KaaError,
@@ -18,7 +18,7 @@ from .resources import Resources  # noqa
 from .response import Response  # noqa
 
 NAME = "KAA"
-VERSION = "0.2.0"
+VERSION = "0.2.1"
 
 
 class KaaServer:
