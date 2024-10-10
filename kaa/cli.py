@@ -50,13 +50,14 @@ class Cli:
         sys.stdout.write(
             "{} version {}\n".format(self.__get_name(), self.__get_version())
         )
-        sys.stdout.write("Server started at {}:{}\n\n".format(self.host, self.port))
+        sys.stdout.write(f"Server started at {self.host}:{self.port}\n\n")
         if not hasattr(self, "server") or self.server is None:
             self.server = Server().get_server()
         make_server(
             host=self.host,
             port=int(self.port),
-            app=lambda env, start_response: self.server.serve(env, start_response),
+            app=lambda env, start_response: self.server.serve(
+                env, start_response),
         ).serve_forever()
 
     def __set_host_port(self):

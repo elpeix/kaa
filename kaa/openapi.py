@@ -124,7 +124,8 @@ def get_decorators(cls):
         decorators[node.name] = {}
         for n in node.decorator_list:
             if isinstance(n, ast.Call):
-                name = n.func.attr if isinstance(n.func, ast.Attribute) else n.func.id
+                name = n.func.attr if isinstance(
+                    n.func, ast.Attribute) else n.func.id
                 if name == PATH:
                     decorators[node.name].update(parse_path(n))
                 elif name == AUTH:
@@ -193,9 +194,6 @@ def parse_path(node):
         idx = 0
         result = {}
         for param in params:
-            """
-                TODO: index range issue
-            """
             if param:
                 result[param] = values[idx]
                 idx += 1
