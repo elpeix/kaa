@@ -15,9 +15,9 @@ pip install kaa-rest-server
 
 ### Main files
 
-#### Definition
+#### Definitions
 
-Requires file definition.py at the top of the project:
+Requires file definitions.py at the top of the project:
 
 ```python
 import logging
