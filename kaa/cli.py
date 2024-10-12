@@ -1,4 +1,7 @@
+import os
+import time
 import sys
+import threading
 from wsgiref.simple_server import make_server
 
 from . import NAME, VERSION, KaaServer
@@ -11,6 +14,7 @@ class Cli:
         self.port = 8086
         self.argv = sys.argv[:]
         self.server: KaaServer
+        self.wsgi_server = None
 
     def execute(self):
         try:
@@ -23,8 +27,18 @@ class Cli:
         elif subcommand == "help":
             msg = self.__get_help()
         elif subcommand == "serve":
-            self.__serve()
+            self.__run_server()
             return
+        elif subcommand == "dev":
+            path = "."  # TODO: create yaml file to configure
+            monitor_thread = threading.Thread(
+                target=self.__monitor_changes, args=(path,)
+            )
+            monitor_thread.daemon = True
+            monitor_thread.start()
+            self.__run_server()
+            return
+
         else:
             msg = "Invalid command. Try help"
 
@@ -42,23 +56,45 @@ class Cli:
         commands = [
             ("version", "Returns Kaa version"),
             ("serve", "Starts a server for development"),
+            ("dev", "Starts server for development in reload mode"),
         ]
         return "\n".join(["{}\t\t{}".format(*cmd) for cmd in commands])
+
+    def __run_server(self):
+        try:
+            self.__serve()
+        except KeyboardInterrupt:
+            print("Server stopped.")
+            sys.exit(0)
 
     def __serve(self):
         self.__set_host_port()
         sys.stdout.write(
             "{} version {}\n".format(self.__get_name(), self.__get_version())
         )
-        sys.stdout.write(f"Server started at {self.host}:{self.port}\n\n")
+        sys.stdout.write(f"Server started at http://{self.host}:{self.port}\n\n")
         if not hasattr(self, "server") or self.server is None:
             self.server = Server().get_server()
-        make_server(
+        self.wsgi_server = make_server(
             host=self.host,
             port=int(self.port),
-            app=lambda env, start_response: self.server.serve(
-                env, start_response),
-        ).serve_forever()
+            app=lambda env, start_response: self.server.serve(env, start_response),
+        )
+        self.wsgi_server.serve_forever()
+
+    def __monitor_changes(self, path, interval=1):
+        last_mtime = None
+        while True:
+            curtent_mtime = max(
+                os.path.getmtime(root)
+                for root, _, files in os.walk(path)
+                for f in files
+            )
+            if last_mtime and curtent_mtime > last_mtime:
+                sys.stdout.write("Changes detected. Restarting server...")
+                os.execv(sys.executable, [sys.executable] + sys.argv)
+            last_mtime = curtent_mtime
+            time.sleep(interval)
 
     def __set_host_port(self):
         try:

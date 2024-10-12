@@ -1,4 +1,5 @@
 # Kaa
+
 A very simple python server framework for REST applications.
 
 ## Starting
@@ -24,7 +25,7 @@ import logging
 
 
 NAME = 'Simple kaa Server'  # Your project name
-VERSION = 'v1.0'  # Version 
+VERSION = 'v1.0'  # Version
 SERVER = 'server.Server'  # Module and main class
 
 LOG = logging.getLogger()
@@ -88,15 +89,16 @@ class AppResources(Resources):
 
 ```
 
-
 ### Starting server
+
 ```
 $ python app.py serve
 ```
 
 By default host is 127.0.0.1 and port is 8086
 
-Start with diferent host and port:
+Start with different host and port:
+
 ```
 $ python app.py serve host:port
 ```

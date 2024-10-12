@@ -15,8 +15,7 @@ class Resources(resources.Resources):
     @PATH(
         "/resource/{resource_id}/",
         description="Resource with id",
-        path_params={"id": {"type": "int",
-                            "description": "Identifier for resource"}},
+        path_params={"id": {"type": "int", "description": "Identifier for resource"}},
         query_params={
             "rparam": {"type": "str", "required": True},
             "iparam": {"type": "int", "default": 42},
