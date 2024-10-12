@@ -16,7 +16,10 @@ pip install kaa-rest-server
 
 ### Main files
 
-#### Definitions
+#### Definitions (deprecated)
+
+> [!WARNING]
+> Deprecated. Use kaa.json to configure server
 
 Requires file definitions.py at the top of the project:
 
@@ -33,6 +36,23 @@ DEBUG = True
 ENABLE_CORS = False
 
 ```
+
+#### kaa.json
+
+New system to define basic configuration
+
+```json
+{
+  "name": "Sample server",
+  "version": "1.0.0",
+  "server": "example.SampleServer",
+  "basePath": "."
+  "debug": false,
+  "enableCors": false
+}
+```
+
+**basePath**: In dev mode. It is the path the system will look at to reload the server.
 
 #### Application file
 

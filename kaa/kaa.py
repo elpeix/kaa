@@ -2,7 +2,7 @@ import importlib
 import sys
 
 import kaa
-from definitions import ENABLE_CORS
+from .kaa_definition import KaaDefinition
 
 from .enums import Status
 from .exceptions import KaaError, ResourceNotFoundError
@@ -19,6 +19,7 @@ class Kaa:
         self.request_filters = {}
         self.response_filters = {}
         self.openapi = None
+        self.definitions = KaaDefinition()
 
     def register_resources(self, module: str, class_name: str):
         self.__register(self.resources, module, class_name)
@@ -76,7 +77,7 @@ class Kaa:
         return self.__print_response(response)
 
     def __act_method_options(self, request: Request):
-        if ENABLE_CORS:
+        if self.definitions.cors_enabled():
             response = Response(Status.ACCEPTED)
             self.__response_filters(request, response)
         else:

@@ -1,11 +1,13 @@
 import importlib
-from definitions import SERVER
 from kaa import KaaServer
+from .kaa_definition import KaaDefinition
 
 
 class Server:
     def __init__(self) -> None:
-        spl = SERVER.split(".")
+        definitions = KaaDefinition()
+        server = definitions.get_server()
+        spl = server.split(".")
         class_name = spl[-1]
         module_name = ".".join(spl[:-1])
         module = importlib.import_module(module_name)

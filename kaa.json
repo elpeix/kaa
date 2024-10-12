@@ -1,0 +1,7 @@
+{
+  "name": "Sample server",
+  "version": "1.0.0",
+  "server": "example.SampleServer",
+  "debug": false,
+  "enableCors": false
+}

@@ -3,8 +3,7 @@ import traceback
 
 import yaml
 
-from definitions import DEBUG, LOG
-
+from .kaa_definition import KaaDefinition
 from .enums import ContentType, Status
 from .request import Request
 
@@ -15,6 +14,7 @@ class Response:
         self.status = status
         self.headers = dict()
         self.set_content_type(ContentType.PLAIN)
+        self.definitions = KaaDefinition()
 
     def body(self, response_body: str):
         self.response_body = response_body
@@ -54,10 +54,10 @@ class Response:
         self.status = Status.SERVER_ERROR
         data = {}
         if exc_info:
-            if DEBUG:
+            if self.definitions.is_debug():
                 data["exception"] = traceback.format_exception(*exc_info)
             else:
-                LOG.error(self.status.value, exc_info=exc_info)
+                self.definitions.log.error(self.status.value, exc_info=exc_info)
         return self.__set_response(request, "Internal server error", data)
 
     def __set_response(self, request: Request, message, data: dict = {}):

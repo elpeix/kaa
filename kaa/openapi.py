@@ -2,17 +2,21 @@ import ast
 import importlib
 import inspect
 
-import definitions
+from .kaa_definition import KaaDefinition
 
 
 class OpenApi:
     OPEN_API_VERSION = "3.0.3"
 
     def generate(self, kaa):
+        definitions = KaaDefinition()
         elements = self.__get_elements(kaa)
         return {
             "openapi": self.OPEN_API_VERSION,
-            "info": {"title": definitions.NAME, "version": definitions.VERSION},
+            "info": {
+                "title": definitions.get_name(),
+                "version": definitions.get_version(),
+            },
             "paths": self.__get_paths(elements),
             # 'components': {
             #     'schemas': {
@@ -124,8 +128,7 @@ def get_decorators(cls):
         decorators[node.name] = {}
         for n in node.decorator_list:
             if isinstance(n, ast.Call):
-                name = n.func.attr if isinstance(
-                    n.func, ast.Attribute) else n.func.id
+                name = n.func.attr if isinstance(n.func, ast.Attribute) else n.func.id
                 if name == PATH:
                     decorators[node.name].update(parse_path(n))
                 elif name == AUTH:

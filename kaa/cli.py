@@ -6,6 +6,7 @@ from wsgiref.simple_server import make_server
 
 from . import NAME, VERSION, KaaServer
 from .server import Server
+from .kaa_definition import KaaDefinition, DefinitionException
 
 
 class Cli:
@@ -15,6 +16,7 @@ class Cli:
         self.argv = sys.argv[:]
         self.server: KaaServer
         self.wsgi_server = None
+        self.__init_configuration()
 
     def execute(self):
         try:
@@ -30,7 +32,7 @@ class Cli:
             self.__run_server()
             return
         elif subcommand == "dev":
-            path = "."  # TODO: create yaml file to configure
+            path = self.definitions.get_base_path()
             monitor_thread = threading.Thread(
                 target=self.__monitor_changes, args=(path,)
             )
@@ -38,7 +40,6 @@ class Cli:
             monitor_thread.start()
             self.__run_server()
             return
-
         else:
             msg = "Invalid command. Try help"
 
@@ -60,6 +61,13 @@ class Cli:
         ]
         return "\n".join(["{}\t\t{}".format(*cmd) for cmd in commands])
 
+    def __init_configuration(self):
+        try:
+            self.definitions = KaaDefinition()
+        except DefinitionException as err:
+            sys.stdout.write(err.message)
+            sys.exit()
+
     def __run_server(self):
         try:
             self.__serve()
@@ -69,8 +77,9 @@ class Cli:
 
     def __serve(self):
         self.__set_host_port()
+        sys.stdout.write(f"{self.__get_name()} version {self.__get_version()}\n")
         sys.stdout.write(
-            "{} version {}\n".format(self.__get_name(), self.__get_version())
+            f"{self.definitions.get_name()} version {self.definitions.get_version()}\n"
         )
         sys.stdout.write(f"Server started at http://{self.host}:{self.port}\n\n")
         if not hasattr(self, "server") or self.server is None:
