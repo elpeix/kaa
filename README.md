@@ -112,14 +112,27 @@ class AppResources(Resources):
 
 ### Starting server
 
-```
+```bash
 python app.py serve
 ```
 
-By default host is 127.0.0.1 and port is 8086
+By default host is localhost and port is 8086
 
 Start with different host and port:
 
+Adding host and port on kaa.json file:
+
+```json
+{
+  // ...
+  "host": "localhost",
+  "port": 1111
+  // ...
+}
 ```
+
+Or in command line:
+
+```bash
 python app.py serve host:port
 ```

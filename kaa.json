@@ -2,6 +2,8 @@
   "name": "Sample server",
   "version": "1.0.0",
   "server": "example.SampleServer",
+  "host": "localhost",
+  "port": 1111,
   "debug": false,
   "enableCors": false
 }

@@ -24,6 +24,8 @@ class KaaDefinition(metaclass=KaaDefinitionMeta):
     DEFAULT_BASE_PATH = "."
     DEFAULT_DEBUG = False
     DEFAULT_ENABLE_CORS = False
+    host = "localhost"
+    port = 8086
 
     definition_data: dict[str, str]
 
@@ -39,6 +41,12 @@ class KaaDefinition(metaclass=KaaDefinitionMeta):
 
         self.get_server()
 
+    def set_host(self, host):
+        self.host = host
+
+    def set_port(self, port):
+        self.port = port
+
     def get_server(self):
         if "server" in self.definition_data.keys():
             return self.definition_data["server"]
@@ -49,6 +57,12 @@ class KaaDefinition(metaclass=KaaDefinitionMeta):
 
     def get_version(self):
         return self.__get_definition("version", self.DEFAULT_VERSION)
+
+    def get_host(self):
+        return self.__get_definition("host", self.host)
+
+    def get_port(self):
+        return self.__get_definition("port", self.port)
 
     def get_base_path(self):
         return self.__get_definition("basePath", self.DEFAULT_BASE_PATH)

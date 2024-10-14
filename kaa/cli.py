@@ -11,8 +11,6 @@ from .kaa_definition import KaaDefinition, DefinitionException
 
 class Cli:
     def __init__(self):
-        self.host = "127.0.0.1"
-        self.port = 8086
         self.argv = sys.argv[:]
         self.server: KaaServer
         self.wsgi_server = None
@@ -81,12 +79,14 @@ class Cli:
         sys.stdout.write(
             f"{self.definitions.get_name()} version {self.definitions.get_version()}\n"
         )
-        sys.stdout.write(f"Server started at http://{self.host}:{self.port}\n\n")
+        host = self.definitions.get_host()
+        port = self.definitions.get_port()
+        sys.stdout.write(f"Server started at http://{host}:{port}\n\n")
         if not hasattr(self, "server") or self.server is None:
             self.server = Server().get_server()
         self.wsgi_server = make_server(
-            host=self.host,
-            port=int(self.port),
+            host=host,
+            port=int(port),
             app=lambda env, start_response: self.server.serve(env, start_response),
         )
         self.wsgi_server.serve_forever()
@@ -109,10 +109,10 @@ class Cli:
         try:
             porthost = self.argv[2].split(":")
             if len(porthost) == 1:
-                self.port = porthost[0]
+                self.definitions.set_port(porthost[0])
             elif len(porthost) == 2:
-                self.host = porthost[0]
-                self.port = porthost[1]
+                self.definitions.set_host(porthost[0])
+                self.definitions.set_port(porthost[1])
             else:
                 sys.stdout.write("Invalid host:port" + "\n")
                 sys.exit(1)
