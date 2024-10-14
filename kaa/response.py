@@ -1,8 +1,6 @@
 import json
 import traceback
 
-import yaml
-
 from .kaa_definition import KaaDefinition
 from .enums import ContentType, Status
 from .request import Request
@@ -25,8 +23,13 @@ class Response:
         return self.body(json.dumps(html))
 
     def yaml(self, response: dict):
-        self.set_content_type(ContentType.YAML)
-        return self.body(yaml.dump(response))
+        try:
+            import yaml
+
+            self.set_content_type(ContentType.YAML)
+            return self.body(yaml.dump(response))
+        except ImportError:
+            return self.body("YAML is not supported")
 
     def json(self, response: dict):
         self.set_content_type(ContentType.JSON)

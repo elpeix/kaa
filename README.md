@@ -6,7 +6,8 @@ A very simple python server framework for REST applications.
 
 ### Requirements
 
-- pyYaml for OpenApi output
+- (optional) pyYaml for OpenApi output: It is not required.
+  If it is not installed, OpenApi always returns a JSON response.
 
 ### Install
 
@@ -112,7 +113,7 @@ class AppResources(Resources):
 ### Starting server
 
 ```
-$ python app.py serve
+python app.py serve
 ```
 
 By default host is 127.0.0.1 and port is 8086
@@ -120,5 +121,5 @@ By default host is 127.0.0.1 and port is 8086
 Start with different host and port:
 
 ```
-$ python app.py serve host:port
+python app.py serve host:port
 ```

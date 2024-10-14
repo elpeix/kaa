@@ -73,7 +73,12 @@ class Kaa:
         if request.get_header("ACCEPT") == "application/json" or format == "json":
             response.json(self.openapi)
         else:
-            response.yaml(self.openapi)
+            try:
+                import yaml
+
+                response.yaml(self.openapi)
+            except ImportError:
+                response.json(self.openapi)
         return self.__print_response(response)
 
     def __act_method_options(self, request: Request):
