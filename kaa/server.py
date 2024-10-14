@@ -1,5 +1,5 @@
 import importlib
-from kaa import KaaServer
+from kaa import KaaServer, StartKaaError
 from .kaa_definition import KaaDefinition
 
 
@@ -10,9 +10,15 @@ class Server:
         spl = server.split(".")
         class_name = spl[-1]
         module_name = ".".join(spl[:-1])
-        module = importlib.import_module(module_name)
+        module = self.__get_module(module_name)
         class_ = getattr(module, class_name)
         self.server = class_()
+
+    def __get_module(self, module_name):
+        try:
+            return importlib.import_module(module_name)
+        except ImportError:
+            raise StartKaaError(f"Module '{module_name}' is not defined.")
 
     def get_server(self) -> KaaServer:
         return self.server

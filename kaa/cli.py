@@ -4,7 +4,7 @@ import sys
 import threading
 from wsgiref.simple_server import make_server
 
-from . import NAME, VERSION, KaaServer
+from . import NAME, VERSION, KaaServer, StartKaaError
 from .server import Server
 from .kaa_definition import KaaDefinition, DefinitionException
 
@@ -63,8 +63,7 @@ class Cli:
         try:
             self.definitions = KaaDefinition()
         except DefinitionException as err:
-            sys.stdout.write(err.message)
-            sys.exit()
+            raise StartKaaError(err.message) from err
 
     def __run_server(self):
         try:
@@ -114,7 +113,18 @@ class Cli:
                 self.definitions.set_host(porthost[0])
                 self.definitions.set_port(porthost[1])
             else:
-                sys.stdout.write("Invalid host:port" + "\n")
-                sys.exit(1)
+                raise StartKaaError("Invalid host:port")
         except IndexError:
             pass
+
+
+def main():
+    # Add current working directory for load app modules
+    sys.path.insert(0, os.getcwd())
+
+    # Start
+    try:
+        Cli().execute()
+    except StartKaaError as err:
+        sys.stdout.write(err.message + "\n")
+        sys.exit(1)

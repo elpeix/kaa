@@ -42,10 +42,10 @@ class KaaDefinition(metaclass=KaaDefinitionMeta):
         self.get_server()
 
     def set_host(self, host):
-        self.host = host
+        self.definition_data["host"] = host
 
     def set_port(self, port):
-        self.port = port
+        self.definition_data["port"] = port
 
     def get_server(self):
         if "server" in self.definition_data.keys():

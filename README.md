@@ -1,4 +1,4 @@
-# Kaa
+# Kaa REST Server
 
 A very simple python server framework for REST applications.
 
@@ -22,7 +22,7 @@ pip install kaa-rest-server
 > [!WARNING]
 > Deprecated. Use kaa.json to configure server
 
-Requires file definitions.py at the top of the project:
+File definitions.py at the top of the project:
 
 ```python
 import logging
@@ -30,12 +30,11 @@ import logging
 
 NAME = 'Simple kaa Server'  # Your project name
 VERSION = 'v1.0'  # Version
-SERVER = 'server.Server'  # Module and main class
+SERVER = 'server.MyServer'  # Module and main class
 
 LOG = logging.getLogger()
 DEBUG = True
 ENABLE_CORS = False
-
 ```
 
 #### kaa.json
@@ -44,10 +43,10 @@ New system to define basic configuration
 
 ```json
 {
-  "name": "Sample server",
+  "name": "My Server",
   "version": "1.0.0",
-  "server": "example.SampleServer",
-  "basePath": "."
+  "server": "server.MyServer",
+  "basePath": ".",
   "debug": false,
   "enableCors": false
 }
@@ -55,13 +54,48 @@ New system to define basic configuration
 
 **basePath**: In dev mode. It is the path the system will look at to reload the server.
 
-#### Application file
+#### Main classes
 
-Requires a simple file to start server (app.py)
+(file server.py)
+
+This class initializes Kaa for each http request
 
 ```python
-import importlib
+from kaa import KaaServer
 
+class Server(KaaServer):
+
+    def register_resources(self):
+        self.kaa.register_resources('resources', 'AppResources')
+```
+
+This class define your resources (resources.py)
+
+```python
+from kaa import GET, PATH, Resources, Response, Status
+
+
+class AppResources(Resources):
+
+    @GET
+    @PATH('/')
+    def basic_resource(self, **params):
+        return Response(Status.OK).json({
+            'message': 'your response'
+        })
+```
+
+#### Application file (optional)
+
+Simple file to start server (app.py) **Optional**
+
+You can call without app.py file:
+
+```bash
+kaa
+```
+
+```python
 from kaa.cli import Cli, Server
 
 
@@ -77,44 +111,31 @@ if __name__ == "__main__":
 
 ```
 
-#### Main classes
-
-(file server.py)
-
-This class initializes Kaa for each http request
-
-```python
-from kaa import Kaa, KaaServer
-
-class Server(KaaServer):
-
-    def register_resources(self):
-        self.kaa.register_resources('app', 'AppResources')
-
-```
-
-This class define your resources
-
-```python
-from kaa import GET, PATH, Resources, Response, Status
-
-
-class AppResources(Resources):
-
-    @GET
-    @PATH('/')
-    def basic_resource(self, **params):
-        return Response(Status.OK).json({
-            'message': 'your response'
-        })
-
-```
-
 ### Starting server
+
+```bash
+kaa serve
+```
+
+(Old mode)
 
 ```bash
 python app.py serve
 ```
+
+Or (with auto reload)
+
+```bash
+kaa dev
+```
+
+(old mode)
+
+```bash
+python3 app.py dev
+```
+
+#### host and port
 
 By default host is localhost and port is 8086
 

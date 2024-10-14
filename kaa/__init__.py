@@ -18,7 +18,7 @@ from .resources import Resources  # noqa
 from .response import Response  # noqa
 
 NAME = "KAA"
-VERSION = "0.2.1"
+VERSION = "0.3.0"
 
 
 class KaaServer:
@@ -40,3 +40,8 @@ class KaaServer:
 
     def generate_openapi(self):
         pass
+
+
+class StartKaaError(Exception):
+    def __init__(self, message: str):
+        self.message = message

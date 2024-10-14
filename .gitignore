@@ -7,5 +7,4 @@ kaa_rest_server.egg-info/
 __pycache__/
 *.log
 *.pyc
-setup.py
 .DS_Store
