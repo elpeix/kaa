@@ -6,8 +6,10 @@ A very simple python server framework for REST applications.
 
 ### Requirements
 
-- (optional) pyYaml for OpenApi output: It is not required.
-  If it is not installed, OpenApi always returns a JSON response.
+There are no requirements.
+
+- (Optional) `pyYAML` for YAML output in OpenAPI and other custom responses.
+  Without it, OpenAPI defaults to JSON.
 
 ### Install
 
@@ -20,7 +22,7 @@ pip install kaa-rest-server
 #### Definitions (deprecated)
 
 > [!WARNING]
-> Deprecated. Use kaa.json to configure server
+> Deprecated. Use kaa.json to configure server.
 
 File definitions.py at the top of the project:
 
@@ -30,7 +32,7 @@ import logging
 
 NAME = 'Simple kaa Server'  # Your project name
 VERSION = 'v1.0'  # Version
-SERVER = 'server.MyServer'  # Module and main class
+SERVER = 'server.MyServer'  # Module and main cl  ass
 
 LOG = logging.getLogger()
 DEBUG = True
@@ -39,7 +41,7 @@ ENABLE_CORS = False
 
 #### kaa.json
 
-New system to define basic configuration
+New system to define configuration:
 
 ```json
 {
@@ -58,7 +60,7 @@ New system to define basic configuration
 
 (file server.py)
 
-This class initializes Kaa for each http request
+This class initializes Kaa for each http request:
 
 ```python
 from kaa import KaaServer
@@ -69,7 +71,7 @@ class Server(KaaServer):
         self.kaa.register_resources('resources', 'AppResources')
 ```
 
-This class define your resources (resources.py)
+This class define your resources (resources.py):
 
 ```python
 from kaa import GET, PATH, Resources, Response, Status
@@ -129,7 +131,7 @@ Or (with auto reload)
 kaa dev
 ```
 
-(old mode)
+(Old mode)
 
 ```bash
 python3 app.py dev
@@ -137,17 +139,17 @@ python3 app.py dev
 
 #### host and port
 
-By default host is localhost and port is 8086
+By default host is localhost and port is 8086.
 
 Start with different host and port:
 
 Adding host and port on kaa.json file:
 
-```json
+```jsonc
 {
   // ...
   "host": "localhost",
-  "port": 1111
+  "port": 1111,
   // ...
 }
 ```
