@@ -25,7 +25,7 @@ class KaaDefinition(metaclass=KaaDefinitionMeta):
     DEFAULT_DEBUG = False
     DEFAULT_ENABLE_CORS = False
     host = "localhost"
-    port = 8086
+    port = 5321
 
     definition_data: dict[str, str]
 

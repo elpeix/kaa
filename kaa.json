@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "server": "example.SampleServer",
   "host": "localhost",
-  "port": 1111,
+  "port": 5111,
   "debug": false,
   "enableCors": false
 }
