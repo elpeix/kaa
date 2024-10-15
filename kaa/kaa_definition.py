@@ -97,14 +97,15 @@ class KaaDefinition(metaclass=KaaDefinitionMeta):
                 f"definitions.py is deprecated. Use {self.DEFINITION_FILE}\n\n"
             )
             return definition_data
-        except ModuleNotFoundError:
-            raise DefinitionException(f"Can not found {self.DEFINITION_FILE}")
+        except ModuleNotFoundError as err:
+            raise DefinitionException(
+                f"Can not found {self.DEFINITION_FILE}") from err
 
     def __get_module_server(self, definitions):
         try:
             return definitions.SERVER
-        except AttributeError:
-            raise DefinitionException("SERVER is not defined")
+        except AttributeError as err:
+            raise DefinitionException("SERVER is not defined") from err
 
     def __get_module_name(self, definitions, default_value):
         try:

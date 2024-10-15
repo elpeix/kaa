@@ -24,7 +24,7 @@ class Request:
 
     def __set_query_value(self, key, value, query_params):
         if key in query_params:
-            if type(query_params[key]) is list:
+            if isinstance(query_params[key], list):
                 query_params[key].append(value)
             else:
                 query_params[key] = [query_params[key], value]

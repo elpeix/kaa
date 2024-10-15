@@ -17,8 +17,9 @@ class Server:
     def __get_module(self, module_name):
         try:
             return importlib.import_module(module_name)
-        except ImportError:
-            raise StartKaaError(f"Module '{module_name}' is not defined.")
+        except ImportError as err:
+            raise StartKaaError(
+                f"Module '{module_name}' is not defined.") from err
 
     def get_server(self) -> KaaServer:
         return self.server

@@ -18,6 +18,7 @@ class Kaa:
         self.resources = {}
         self.request_filters = {}
         self.response_filters = {}
+        self.start_response = None
         self.openapi = None
         self.definitions = KaaDefinition()
 
@@ -43,15 +44,15 @@ class Kaa:
             if request.method == "OPTIONS":
                 return self.__act_method_options(request)
 
-            if request.path == "/openapi" or request.path == "/openapi.yaml":
+            if request.path in ("/openapi", "/openapi.yaml"):
                 return self.__get_openapi(request)
 
             if request.path == "/openapi.json":
                 return self.__get_openapi(request, "json")
 
             self.__request_filters(request)
-            for module_name in self.resources:
-                for class_name in self.resources[module_name]:
+            for module_name, class_names in self.resources.items():
+                for class_name in class_names:
                     response: Response = self.__run_resource(
                         request, module_name, class_name
                     )
@@ -66,11 +67,11 @@ class Kaa:
                 Response().server_error(request, sys.exc_info())
             )
 
-    def __get_openapi(self, request: Request, format="yaml"):
+    def __get_openapi(self, request: Request, response_format="yaml"):
         if self.openapi is None:
             self.openapi = OpenApi().generate(self)
         response = Response()
-        if request.get_header("ACCEPT") == "application/json" or format == "json":
+        if request.get_header("ACCEPT") == "application/json" or response_format == "json":
             response.json(self.openapi)
         else:
             try:
@@ -113,9 +114,7 @@ class Kaa:
         instance: Resources = class_(request)
         for method_name in dir(class_):
             count = 1 + len(class_name) + 2
-            if method_name[:2] == "__" or method_name[:count] == "_{}__".format(
-                class_name
-            ):
+            if method_name[:2] == "__" or method_name[:count] == f"_{class_name}__":
                 continue
             method_ = getattr(class_, method_name)
             result = method_(instance)
@@ -129,7 +128,7 @@ class Kaa:
 
     def __print_response(self, response: Response):
         headers = [(k, response.headers[k]) for k in response.headers]
-        headers.append(("Server", "{}/{}".format(kaa.NAME, kaa.VERSION)))
+        headers.append(("Server", f"{kaa.NAME}/{kaa.VERSION}"))
         self.start_response(response.get_status_code(), headers)
         if response.response_body is None:
             return []

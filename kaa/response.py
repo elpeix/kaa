@@ -60,12 +60,14 @@ class Response:
             if self.definitions.is_debug():
                 data["exception"] = traceback.format_exception(*exc_info)
             else:
-                self.definitions.log.error(self.status.value, exc_info=exc_info)
+                self.definitions.log.error(
+                    self.status.value, exc_info=exc_info)
         return self.__set_response(request, "Internal server error", data)
 
     def __set_response(self, request: Request, message, data: dict = {}):
         if request.get_header("ACCEPT") == "application/json":
-            self.json({"status": self.status.value[0], "message": message, **data})
+            self.json(
+                {"status": self.status.value[0], "message": message, **data})
         else:
             self.body(message + "\n" + str(data) if data else message)
         return self

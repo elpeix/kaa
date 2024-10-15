@@ -75,22 +75,20 @@ def PATH(uri, query_params: dict = {}, **kwargs):
                 return
 
             regexp = r"^\{([a-z_][a-zA-Z0-9_]+)(:[^}]+){0,1}\}$"
-            arguments = dict()
-            for i in range(len(split_defined_path)):
-                if split_defined_path[i] == split_request_path[i]:
+            arguments = {}
+            for d_path, r_path in zip(split_defined_path, split_request_path):
+                if d_path == r_path:
                     continue
-                m = re.search(regexp, split_defined_path[i])
-
+                m = re.search(regexp, d_path)
                 if m is None:
                     return
-
                 if m.group(2):
                     pattern = re.compile(m.group(2)[1:])
-                    n = re.search(pattern, split_request_path[i])
+                    n = re.search(pattern, r_path)
                     if n is None:
                         return
-                arguments[m.group(1)] = split_request_path[i]
-                arguments.update(q_params.get_params(query_params))
+                arguments[m.group(1)] = r_path
+            arguments.update(q_params.get_params(query_params))
             return func(self, **arguments)
 
         return wrapper
