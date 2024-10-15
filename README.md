@@ -2,46 +2,15 @@
 
 A very simple python server framework for REST applications.
 
-## Starting
-
-### Requirements
-
-There are no requirements.
-
-- (Optional) `pyYAML` for YAML output in OpenAPI and other custom responses.
-  Without it, OpenAPI defaults to JSON.
-
-### Install
+## Install
 
 ```bash
 pip install kaa-rest-server
 ```
 
-### Main files
+## Configuration
 
-#### Definitions (deprecated)
-
-> [!WARNING]
-> Deprecated. Use kaa.json to configure server.
-
-File definitions.py at the top of the project:
-
-```python
-import logging
-
-
-NAME = 'Simple kaa Server'  # Your project name
-VERSION = 'v1.0'  # Version
-SERVER = 'server.MyServer'  # Module and main cl  ass
-
-LOG = logging.getLogger()
-DEBUG = True
-ENABLE_CORS = False
-```
-
-#### kaa.json
-
-New system to define configuration:
+**kaa.json**: Specifies server handling.
 
 ```json
 {
@@ -56,22 +25,29 @@ New system to define configuration:
 
 **basePath**: In dev mode. It is the path the system will look at to reload the server.
 
-#### Main classes
+### Definitions (deprecated)
 
-(file server.py)
+See [Legacy Documentation](docs/legacy.md)
 
-This class initializes Kaa for each http request:
+## Main classes
+
+### server.py
+
+Initializes Kaa for each http request:
 
 ```python
 from kaa import KaaServer
 
-class Server(KaaServer):
+
+class MyServer(KaaServer):
 
     def register_resources(self):
-        self.kaa.register_resources('resources', 'AppResources')
+        self.kaa.register_resources("resources", "AppResources")
 ```
 
-This class define your resources (resources.py):
+### resources.py
+
+This class define your resources (or routes):
 
 ```python
 from kaa import GET, PATH, Resources, Response, Status
@@ -80,76 +56,38 @@ from kaa import GET, PATH, Resources, Response, Status
 class AppResources(Resources):
 
     @GET
-    @PATH('/')
+    @PATH("/")
     def basic_resource(self, **params):
         return Response(Status.OK).json({
-            'message': 'your response'
+            "message": "your response"
         })
 ```
 
-#### Application file (optional)
+## Starting server
 
-Simple file to start server (app.py) **Optional**
-
-You can call without app.py file:
-
-```bash
-kaa
-```
-
-```python
-from kaa.cli import Cli, Server
-
-
-# For WSGI application
-def application(env, start_response):
-    return Server().serve(env, start_response)
-
-
-# For development
-if __name__ == "__main__":
-    cli = Cli()
-    cli.execute()
-
-```
-
-### Starting server
+**Static mode** (serve): Starts Kaa server in static mode. Every code change needs restart server manually.
 
 ```bash
 kaa serve
 ```
 
-(Old mode)
-
-```bash
-python app.py serve
-```
-
-Or (with auto reload)
+**Development mode** (dev): Start server that auto restarts on every code change.
 
 ```bash
 kaa dev
 ```
 
-(Old mode)
+## Custom host and port
 
-```bash
-python3 app.py dev
-```
+By default host is localhost and port is 5321.
 
-#### host and port
-
-By default host is localhost and port is 8086.
-
-Start with different host and port:
-
-Adding host and port on kaa.json file:
+You can change them adding host and port on kaa.json file:
 
 ```jsonc
 {
   // ...
   "host": "localhost",
-  "port": 1111,
+  "port": 5111,
   // ...
 }
 ```
@@ -157,5 +95,9 @@ Adding host and port on kaa.json file:
 Or in command line:
 
 ```bash
-python app.py serve host:port
+kaa serve host:port
 ```
+
+## More
+
+For more information, [view Documentation](docs/README.md).
