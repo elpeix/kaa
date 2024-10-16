@@ -10,6 +10,7 @@ class Request:
         self.content_type = self.env["CONTENT_TYPE"]
         self.query = self.__get_query()
         self.headers = self.__get_headers()
+        self.data = RequestData()
 
     def __get_query(self):
         query_params = {}
@@ -65,3 +66,25 @@ class Request:
             except ValueError:
                 return {}
         return {}
+
+    def get_data(self):
+        return self.data
+
+
+class RequestData:
+    __data = {}
+
+    def get(self, key):
+        return self.__data.get(key)
+
+    def get_all(self):
+        return self.__data
+
+    def add(self, key, value):
+        self.__data[key] = value
+
+    def remove(self, key):
+        return self.__data.get(key)
+
+    def clear(self):
+        self.__data.clear()
