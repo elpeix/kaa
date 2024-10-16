@@ -84,7 +84,7 @@ class RequestData:
         self.__data[key] = value
 
     def remove(self, key):
-        return self.__data.get(key)
+        return self.__data.pop(key)
 
     def clear(self):
         self.__data.clear()
