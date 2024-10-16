@@ -13,7 +13,7 @@ from .exceptions import (
 )
 from .filters import RequestFilter, ResponseFilter  # noqa
 from .kaa import Kaa  # noqa
-from .request import Request  # noqa
+from .request import Request, RequestData  # noqa
 from .resources import Resources  # noqa
 from .response import Response  # noqa
 
