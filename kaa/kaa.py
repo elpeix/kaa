@@ -120,7 +120,7 @@ class Kaa:
             result = method_(instance)
             if result:
                 return result
-        raise ResourceNotFoundError()
+        return None
 
     def __get_class(self, module_name, class_name):
         module = importlib.import_module(module_name)
