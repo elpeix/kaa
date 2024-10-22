@@ -1,4 +1,5 @@
-from kaa.cli import Cli, Server
+from kaa.cli import Server
+
 
 # For WSGI application
 def application(env, start_response):
