@@ -74,7 +74,8 @@ class Cli:
 
     def __serve(self):
         self.__set_host_port()
-        sys.stdout.write(f"{self.__get_name()} version {self.__get_version()}\n")
+        sys.stdout.write(
+            f"{self.__get_name()} version {self.__get_version()}\n")
         sys.stdout.write(
             f"{self.definitions.get_name()} version {self.definitions.get_version()}\n"
         )
@@ -86,7 +87,8 @@ class Cli:
         self.wsgi_server = make_server(
             host=host,
             port=int(port),
-            app=lambda env, start_response: self.server.serve(env, start_response),
+            app=lambda env, start_response: self.server.serve(
+                env, start_response),
         )
         self.wsgi_server.serve_forever()
 
@@ -94,15 +96,31 @@ class Cli:
         last_mtime = None
         while True:
             curtent_mtime = max(
-                os.path.getmtime(root)
+                os.path.getmtime(os.path.join(root, f))
                 for root, _, files in os.walk(path)
-                for f in files
+                if self.__is_valid_directory(root)
+                for f in files if self.__is_valid_file(f)
             )
             if last_mtime and curtent_mtime > last_mtime:
                 sys.stdout.write("Changes detected. Restarting server...")
                 os.execv(sys.executable, [sys.executable] + sys.argv)
             last_mtime = curtent_mtime
             time.sleep(interval)
+
+    def __is_valid_directory(self, directory):
+        excluded_dirs = ["__pycache__", ".git",
+                         ".venv", "dist", "build", "tests", "test", "docs"]
+        return not any(excluded in directory for excluded in excluded_dirs)
+
+    def __is_valid_file(self, file):
+        excluded_files = [
+            "*.pyc", "*.pyo", "*.pyd", "*.md"
+        ]
+        if any(file.endswith(excluded) for excluded in excluded_files):
+            return False
+        allowed_files = ["py", "html", "yaml", "json"]
+        valid_file = file.split(".")[-1] in allowed_files
+        return valid_file and not file.startswith(".")
 
     def __set_host_port(self):
         try:
