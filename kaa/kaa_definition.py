@@ -2,6 +2,7 @@ import json
 import os
 import sys
 import logging
+from typing import Any
 from threading import Lock
 
 
@@ -35,19 +36,25 @@ class KaaDefinition(metaclass=KaaDefinitionMeta):
     host = "localhost"
     port = 5321
 
-    definition_data: dict[str, any]
+    definition_data: dict[str, Any]
 
-    def __init__(self) -> None:
+    def __init__(self, definition_path=None) -> None:
         self.log = logging.getLogger()
-        base_path = os.getcwd()
-        definition_path = f"{base_path}/{self.DEFINITION_FILE}"
+        if not definition_path:
+            definition_path = f"{os.getcwd()}/{self.DEFINITION_FILE}"
         if os.path.isfile(definition_path):
-            with open(definition_path, "r", encoding="utf-8") as file:
-                self.definition_data = json.load(file)
+            self.definition_data = self.__get_json_definition_data(definition_path)
         else:
             self.definition_data = self.__get_default_definition()
 
         self.get_server()
+
+    def __get_json_definition_data(self, definition_path):
+        try:
+            with open(definition_path, "r", encoding="utf-8") as file:
+                return json.load(file)
+        except json.JSONDecodeError as err:
+            raise DefinitionException(f"{definition_path} is not a valid JSON") from err
 
     def set_host(self, host):
         self.definition_data["host"] = host
@@ -80,7 +87,7 @@ class KaaDefinition(metaclass=KaaDefinitionMeta):
 
     def get_polling_interval(self):
         return self.__get_polling_definition(
-            "interval", self.DEFAULT_POLLING_INTERVAL
+            "intervalSeconds", self.DEFAULT_POLLING_INTERVAL
         )
 
     def get_polling_inclusions(self):
@@ -88,19 +95,15 @@ class KaaDefinition(metaclass=KaaDefinitionMeta):
             self.__get_polling_inclusions(
                 "directories", self.DEFAULT_POLLING_INCLUDE_DIRS
             ),
-            self.__get_polling_inclusions(
-                "files", self.DEFAULT_POLLING_INCLUDE_FILES
-            )
+            self.__get_polling_inclusions("files", self.DEFAULT_POLLING_INCLUDE_FILES),
         )
 
-    def get_polling_exlusions(self):
+    def get_polling_exclusions(self):
         return (
             self.__get_polling_exclusions(
                 "directories", self.DEFAULT_POLLING_EXCLUDE_DIRS
             ),
-            self.__get_polling_exclusions(
-                "files", self.DEFAULT_POLLING_EXCLUDE_FILES
-            )
+            self.__get_polling_exclusions("files", self.DEFAULT_POLLING_EXCLUDE_FILES),
         )
 
     def is_debug(self):
@@ -110,11 +113,11 @@ class KaaDefinition(metaclass=KaaDefinitionMeta):
         return self.__get_definition("enableCors", self.DEFAULT_ENABLE_CORS)
 
     def __get_polling_inclusions(self, key, default_value):
-        inclusions = self.__get_polling_definition("inclusions", default_value)
+        inclusions = self.__get_polling_definition("inclusions", {})
         return self.__get_value(inclusions, key, default_value)
 
     def __get_polling_exclusions(self, key, default_value):
-        exclusions = self.__get_polling_definition("exclusions", default_value)
+        exclusions = self.__get_polling_definition("exclusions", {})
         return self.__get_value(exclusions, key, default_value)
 
     def __get_polling_definition(self, key, default_value):
@@ -125,11 +128,7 @@ class KaaDefinition(metaclass=KaaDefinitionMeta):
         return self.__get_value(self.definition_data, key, default_value)
 
     def __get_value(self, data, key, default_value):
-        return (
-            data[key]
-            if key in data.keys()
-            else default_value
-        )
+        return data[key] if key in data.keys() else default_value
 
     def __get_default_definition(self):
         try:
@@ -149,8 +148,7 @@ class KaaDefinition(metaclass=KaaDefinitionMeta):
             )
             return definition_data
         except ModuleNotFoundError as err:
-            raise DefinitionException(
-                f"Can not found {self.DEFINITION_FILE}") from err
+            raise DefinitionException(f"Can not found {self.DEFINITION_FILE}") from err
 
     def __get_module_server(self, definitions):
         try:

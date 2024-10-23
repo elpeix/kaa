@@ -1,0 +1,22 @@
+{
+  "name": "name",
+  "server": "server",
+  "version": "1.2.3",
+  "basePath": "/the/path",
+  "host": "127.0.0.1",
+  "port": 5123,
+  "debug": true,
+  "enableCors": true,
+  "developmentPolling": {
+    "enabled": true,
+    "intervalSeconds": 5,
+    "inclusions": {
+      "directories": ["src"],
+      "files": ["*.py"]
+    },
+    "exclusions": {
+      "directories": ["tests", "__pycache__"],
+      "files": ["*.pyc", "*.log"]
+    }
+  }
+}
