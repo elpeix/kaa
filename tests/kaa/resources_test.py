@@ -1,5 +1,4 @@
 import json
-import unittest
 
 from kaa import (
     AUTH,
@@ -14,9 +13,10 @@ from kaa import (
     Response,
     Status,
 )
+from tests.kaa.test_base import TestBase
 
 
-class ResourcesTest(unittest.TestCase):
+class TestResources(TestBase):
     def test_not_found(self):
         self.__run_kaa(
             method="GET",

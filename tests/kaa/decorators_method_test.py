@@ -2,10 +2,10 @@ from mock import Mock
 
 from kaa import GET, POST, PUT, DELETE
 
-from .decorators_test import DecoratorsTest
+from .decorators_test import TestDecorators
 
 
-class DecoratorsMethodTest(DecoratorsTest):
+class TestDecoratorsMethod(TestDecorators):
     def test_get_wrong(self):
         response = self.__test_method(GET, "POST")
         self.assertIsNone(response)

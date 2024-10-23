@@ -1,9 +1,8 @@
-import unittest
-
 from kaa import Request, Resources
+from tests.kaa.test_base import TestBase
 
 
-class DecoratorsTest(unittest.TestCase):
+class TestDecorators(TestBase):
     def get_resource(self, method="", path="path", q=""):
         request = Request(
             {
