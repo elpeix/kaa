@@ -1,12 +1,14 @@
 import os
 import time
 import sys
-import threading
+from threading import Thread
 from wsgiref.simple_server import make_server
+
 
 from . import NAME, VERSION, KaaServer, StartKaaError
 from .server import Server
 from .kaa_definition import KaaDefinition, DefinitionException
+from .watchers import FileWatcher, KeyWatcher
 
 
 class Cli:
@@ -27,15 +29,12 @@ class Cli:
         elif subcommand == "help":
             msg = self.__get_help()
         elif subcommand == "serve":
+            self.__init_key_watcher()
             self.__run_server()
             return
         elif subcommand == "dev":
-            path = self.definitions.get_base_path()
-            monitor_thread = threading.Thread(
-                target=self.__monitor_changes, args=(path,)
-            )
-            monitor_thread.daemon = True
-            monitor_thread.start()
+            self.__init_file_watcher()
+            self.__init_key_watcher()
             self.__run_server()
             return
         else:
@@ -72,10 +71,29 @@ class Cli:
             print("Server stopped.")
             sys.exit(0)
 
+    def __init_file_watcher(self):
+        if not self.definitions.is_polling_enabled():
+            return
+        file_watcher = FileWatcher()
+        watcher_thread = Thread(
+            target=file_watcher.watch,
+            args=(lambda action: self.__event_watch(action),),
+        )
+        watcher_thread.daemon = True
+        watcher_thread.start()
+
+    def __init_key_watcher(self):
+        key_watcher = KeyWatcher()
+        key_watcher_thread = Thread(
+            target=key_watcher.watch,
+            args=(lambda action: self.__event_watch(action),),
+        )
+        key_watcher_thread.daemon = True
+        key_watcher_thread.start()
+
     def __serve(self):
         self.__set_host_port()
-        sys.stdout.write(
-            f"{self.__get_name()} version {self.__get_version()}\n")
+        sys.stdout.write(f"{self.__get_name()} version {self.__get_version()}\n")
         sys.stdout.write(
             f"{self.definitions.get_name()} version {self.definitions.get_version()}\n"
         )
@@ -87,40 +105,17 @@ class Cli:
         self.wsgi_server = make_server(
             host=host,
             port=int(port),
-            app=lambda env, start_response: self.server.serve(
-                env, start_response),
+            app=lambda env, start_response: self.server.serve(env, start_response),
         )
         self.wsgi_server.serve_forever()
 
-    def __monitor_changes(self, path, interval=1):
-        last_mtime = None
-        while True:
-            curtent_mtime = max(
-                os.path.getmtime(os.path.join(root, f))
-                for root, _, files in os.walk(path)
-                if self.__is_valid_directory(root)
-                for f in files if self.__is_valid_file(f)
-            )
-            if last_mtime and curtent_mtime > last_mtime:
-                sys.stdout.write("Changes detected. Restarting server...")
-                os.execv(sys.executable, [sys.executable] + sys.argv)
-            last_mtime = curtent_mtime
-            time.sleep(interval)
-
-    def __is_valid_directory(self, directory):
-        excluded_dirs = ["__pycache__", ".git",
-                         ".venv", "dist", "build", "tests", "test", "docs"]
-        return not any(excluded in directory for excluded in excluded_dirs)
-
-    def __is_valid_file(self, file):
-        excluded_files = [
-            "*.pyc", "*.pyo", "*.pyd", "*.md"
-        ]
-        if any(file.endswith(excluded) for excluded in excluded_files):
-            return False
-        allowed_files = ["py", "html", "yaml", "json"]
-        valid_file = file.split(".")[-1] in allowed_files
-        return valid_file and not file.startswith(".")
+    def __event_watch(self, action: str):
+        if "restart" == action:
+            print("Restarting server...\n")
+            os.execv(sys.executable, [sys.executable] + sys.argv)
+        elif "quit" == action:
+            print("Bye")
+            os._exit(0)
 
     def __set_host_port(self):
         try:
