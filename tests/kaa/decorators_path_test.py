@@ -1,8 +1,8 @@
 from kaa import PATH
-from .decorators_test import DecoratorsTest
+from .decorators_test import TestDecorators
 
 
-class DecoratorPathTest(DecoratorsTest):
+class TestDecoratorPath(TestDecorators):
     def test_path_wrong(self):
         path_func = PATH("/path")
         func = path_func(self.__set_assert_args())
