@@ -4,6 +4,32 @@
   "server": "example.SampleServer",
   "host": "localhost",
   "port": 5111,
-  "debug": false,
-  "enableCors": false
+  "debug": true,
+  "enableCors": false,
+
+  "developmentPolling": {
+    "enabled": true,
+    "intervalSeconds": 1,
+    "inclusions": {
+      "directories": [
+        "src"
+      ],
+      "files": [
+        "*.py"
+      ]
+    },
+    "exclusions": {
+      "directories": [
+        "docs",
+        "tests",
+        "__pycache__"
+      ],
+      "files": [ 
+        "*.pyc",
+        "*.md",
+        "*.log",
+        "LICENSE"
+      ]
+    }
+  }
 }
