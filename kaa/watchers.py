@@ -19,7 +19,7 @@ class KeyWatcher:
 class FileWatcher:
     def __init__(self) -> None:
         definition = KaaDefinition()
-        self.path = definition.get_base_path()
+        self.path = definition.get_root_path()
         self.interval = definition.get_polling_interval()
         self.validator = ElementValidator(*definition.get_polling_paths())
 

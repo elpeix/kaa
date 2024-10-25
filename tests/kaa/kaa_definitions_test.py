@@ -22,7 +22,7 @@ class TestKaaDefinition:
         definition = DefinitionDefaults(self.__get_json_path("default_values.json"))
         assert KaaDefinition.DEFAULT_NAME == definition.get_name()
         assert KaaDefinition.DEFAULT_VERSION == definition.get_version()
-        assert KaaDefinition.DEFAULT_BASE_PATH == definition.get_base_path()
+        assert KaaDefinition.DEFAULT_ROOT_PATH == definition.get_root_path()
         assert KaaDefinition.DEFAULT_DEBUG == definition.is_debug()
         assert KaaDefinition.DEFAULT_ENABLE_CORS == definition.cors_enabled()
         assert KaaDefinition.DEFAULT_POLLING_ENABLED == definition.is_polling_enabled()

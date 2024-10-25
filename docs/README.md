@@ -1,7 +1,7 @@
 # Documentation
 
-This project wants to provide an easy and fast REST interface development.
-It is auto documented with OpenAPI spec (only routes).
+This project wants to provide an easy and fast REST interface development. It
+is auto documented with OpenAPI spec (only routes).
 
 ## Requirements
 
@@ -14,7 +14,7 @@ There are no requirements.
 
 ### With PIP
 
-```bash
+```console
 pip install kaa-rest-server
 ```
 
@@ -24,37 +24,38 @@ Download code from <https://github.com/elpeix/kaa>.
 
 ## Prepare server
 
-### kaa.json
+### [Configuration](docs/configuration.md)
 
-Specifies server handling.
+**kaa.json**: Specifies server handling.
 
 ```json
 {
   "name": "My Server",
   "version": "1.0.0",
   "server": "server.MyServer",
-  "basePath": ".",
   "debug": false,
-  "enableCors": false
+  "enableCors": false,
+  "developmentPolling": {
+    "enabled": true,
+    "intervalSeconds": 1,
+    "include": [".", "src", "*.py"],
+    "exclude": [
+      "docs",
+      "tests",
+      "__pycache__",
+      "*.md"
+    ]
+  }
 }
 ```
 
-#### Properties
-
-- **name**: Name of your project.
-- **version**: Version of your project.
-- **server**: defines module and class where is located your server definition. **Required**.
-- **debug**: Debug mode will log all steps. Default value: _false_
-- **enableCors**: It will check a request with OPTION method. Cors requires to create a _Response Filter_.
-- **basePath**: In dev mode. It is the path the system will look at to reload the server. Default value: _"."_.
-- **host**: Default value: _localhost_.
-- **port**: Default value: _5321_.
+See [Configuration](docs/configuration.md).
 
 ### Run server
 
 #### CLI
 
-```bash
+```console
 kaa serve
 ```
 
@@ -62,7 +63,7 @@ By default host is _localhost_ and port is _5321_.
 
 You can define host and port in kaa.json or in console:
 
-```bash
+```console
 kaa serve host:port
 ```
 
@@ -81,7 +82,8 @@ def application(env, start_response):
     return Server().serve(env, start_response)
 ```
 
-Requires WSGI configuration. uWSGI: <https://uwsgi-docs.readthedocs.io/en/latest/index.html>
+Requires WSGI configuration. uWSGI:
+<https://uwsgi-docs.readthedocs.io/en/latest/index.html>
 
 ## Server class
 
@@ -110,13 +112,13 @@ This method registers classes with resources. _(view [Resources](#resources))_
 register_filter_request(module: str, class_name: str)
 ```
 
-This method registers classes with request filters. Each request it will
-pass through these filters before enter to resource.
+This method registers classes with request filters. Each request it will pass
+through these filters before enter to resource.
 
 ### Register response filters
 
-This method registers classes with response filters. Each response it will
-pass through these filters after resource (valid resources) and before return
+This method registers classes with response filters. Each response it will pass
+through these filters after resource (valid resources) and before return
 response to client.
 
 ```python
@@ -143,8 +145,8 @@ class AppResources(Resources):
         })
 ```
 
-You can create resource classes and register them at your _server_ class.
-This classes must extend **Resource** from **kaa** module.
+You can create resource classes and register them at your _server_ class. This
+classes must extend **Resource** from **kaa** module.
 
 #### Path
 
@@ -152,11 +154,10 @@ Decorator @PATH
 
 ##### Argument uri
 
-The argument _uri_ is required and identifies the uri path to which the
-resource responds and is specified method of a resource. Uri path are
-uris with variables. These variables are substituted in order to respond
-to a request based on the substituted uri. Variables are denoted by
-braces (`{` and `}`).
+The argument _uri_ is required and identifies the uri path to which the resource
+responds and is specified method of a resource. Uri path are uris with
+variables. These variables are substituted in order to respond to a request
+based on the substituted uri. Variables are denoted by braces (`{` and `}`).
 
 Example:
 
@@ -166,9 +167,9 @@ Example:
 @PATH(uri="/users/{username}")
 ```
 
-In this example, a user is prompted to type his or her name, and then
-Kaa responds. For example, if the user types the user name “Mowgli,”
-the server responds to the following URL:
+In this example, a user is prompted to type his or her name, and then Kaa
+responds. For example, if the user types the user name “Mowgli,” the server
+responds to the following URL:
 
 `http://localhost:5321/users/Mowgli`
 
@@ -191,8 +192,8 @@ But it responds to the following URL:
 
 ##### Other arguments
 
-**query_params**: Captures typed query params and pass them to resource
-method as arguments.
+**query_params**: Captures typed query params and pass them to resource method
+as arguments.
 
 Example:
 
@@ -218,8 +219,8 @@ Allowed types:
 
 If type is not defined param it will be a _str_.
 
-When query param has a diferent type as its definition,
-it will be launch a **400 Bad Request** response.
+When query param has a diferent type as its definition, it will be launch a
+**400 Bad Request** response.
 
 A query param can be required.
 
@@ -235,8 +236,8 @@ A query param can be required.
     pass
 ```
 
-In this exampla, query parama _q_ is required.
-If it is not passed, it will be launch **400 Bad Request** response.
+In this exampla, query parama _q_ is required. If it is not passed, it will be
+launch **400 Bad Request** response.
 
 **path_params**: Only for OpenAPI documentation. Describe path params.
 
@@ -273,8 +274,8 @@ HTTP methods with decorator. They don't have arguments.
 
 Decorator: @AUTH(AuthClass())
 
-This decorators calls the class AuthClass.
-This class must extends **Authorization** from _kaa_.
+This decorators calls the class AuthClass. This class must extends
+**Authorization** from _kaa_.
 
 Example:
 
@@ -307,4 +308,5 @@ Returns OpenAPI response.
 
 If PyYAML is installer,in **YAML** format.
 
-You can get the response in **JSON** format with request header: `Accept: application/json`.
+You can get the response in **JSON** format with request header:
+`Accept: application/json`.

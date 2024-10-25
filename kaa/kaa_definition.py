@@ -22,7 +22,7 @@ class KaaDefinition(metaclass=KaaDefinitionMeta):
     DEFINITION_FILE = "kaa.json"
     DEFAULT_NAME = "Generic name"
     DEFAULT_VERSION = "v0"
-    DEFAULT_BASE_PATH = "."
+    DEFAULT_ROOT_PATH = "."
     DEFAULT_DEBUG = False
     DEFAULT_ENABLE_CORS = False
 
@@ -86,8 +86,8 @@ class KaaDefinition(metaclass=KaaDefinitionMeta):
     def get_port(self):
         return self.__get_definition("port", self.port)
 
-    def get_base_path(self):
-        return self.__get_definition("basePath", self.DEFAULT_BASE_PATH)
+    def get_root_path(self):
+        return self.__get_definition("rootPath", self.DEFAULT_ROOT_PATH)
 
     def is_polling_enabled(self):
         return self.__get_polling_definition("enabled", self.DEFAULT_POLLING_ENABLED)
@@ -121,7 +121,7 @@ class KaaDefinition(metaclass=KaaDefinitionMeta):
 
     def __get_default_definition(self):
         try:
-            import definitions
+            import definitions # type: ignore # no requirements
 
             definition_data = {
                 "name": self.__get_module_name(definitions, self.DEFAULT_NAME),
