@@ -2,7 +2,7 @@
   "name": "name",
   "server": "server",
   "version": "1.2.3",
-  "basePath": "/the/path",
+  "rootPath": "/the/path",
   "host": "127.0.0.1",
   "port": 5123,
   "debug": true,

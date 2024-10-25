@@ -4,11 +4,11 @@ A very simple python server framework for REST applications.
 
 ## Install
 
-```bash
+```console
 pip install kaa-rest-server
 ```
 
-## Configuration
+## [Configuration](docs/configuration.md) - kaa.json
 
 **kaa.json**: Specifies server handling.
 
@@ -17,13 +17,23 @@ pip install kaa-rest-server
   "name": "My Server",
   "version": "1.0.0",
   "server": "server.MyServer",
-  "basePath": ".",
   "debug": false,
-  "enableCors": false
+  "enableCors": false,
+  "developmentPolling": {
+    "enabled": true,
+    "intervalSeconds": 1,
+    "include": [".", "src", "*.py"],
+    "exclude": [
+      "docs",
+      "tests",
+      "__pycache__",
+      "*.md"
+    ]
+  }
 }
 ```
 
-**basePath**: In dev mode. It is the path the system will look at to reload the server.
+See [Configuration](docs/configuration.md).
 
 ### Definitions (deprecated)
 
@@ -68,13 +78,13 @@ class AppResources(Resources):
 **Static mode** (serve): Starts Kaa server in static mode. Every code change
 needs restart server manually.
 
-```bash
+```console
 kaa serve
 ```
 
 **Development mode** (dev): Start server that auto restarts on every code change.
 
-```bash
+```console
 kaa dev
 ```
 
@@ -95,7 +105,7 @@ You can change them adding host and port on kaa.json file:
 
 Or in command line:
 
-```bash
+```console
 kaa serve host:port
 ```
 
