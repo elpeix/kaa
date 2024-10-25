@@ -65,7 +65,8 @@ class AppResources(Resources):
 
 ## Starting server
 
-**Static mode** (serve): Starts Kaa server in static mode. Every code change needs restart server manually.
+**Static mode** (serve): Starts Kaa server in static mode. Every code change
+needs restart server manually.
 
 ```bash
 kaa serve

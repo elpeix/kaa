@@ -1,52 +1,8 @@
+import fnmatch
 import os
 import time
 
 from .kaa_definition import KaaDefinition
-
-
-class FileWatcher:
-    def __init__(self) -> None:
-        self.definition = KaaDefinition()
-
-    def watch(self, callback):
-        last_mtime = None
-        path = self.definition.get_base_path()
-        interval = self.definition.get_polling_interval()
-        while True:
-            curtent_mtime = max(
-                os.path.getmtime(os.path.join(root, f))
-                for root, _, files in os.walk(path)
-                if self.__is_valid_directory(root)
-                for f in files
-                if self.__is_valid_file(f)
-            )
-            if last_mtime and curtent_mtime > last_mtime:
-                print("Changes detected.")
-                callback("restart")
-            last_mtime = curtent_mtime
-            time.sleep(interval)
-
-    def __is_valid_directory(self, directory):
-        # TODO: use inclusions and exclusions
-        excluded_dirs = [
-            "__pycache__",
-            ".git",
-            ".venv",
-            "dist",
-            "build",
-            "tests",
-            "docs",
-        ]
-        return not any(excluded in directory for excluded in excluded_dirs)
-
-    def __is_valid_file(self, file):
-        # TODO: use inclusions and exclusions
-        excluded_files = ["*.pyc", "*.pyo", "*.pyd", "*.md"]
-        if any(file.endswith(excluded) for excluded in excluded_files):
-            return False
-        allowed_files = ["py", "html", "yaml", "json"]
-        valid_file = file.split(".")[-1] in allowed_files
-        return valid_file and not file.startswith(".")
 
 
 class KeyWatcher:
@@ -58,3 +14,48 @@ class KeyWatcher:
             if "q" == a:
                 callback("quit")
             time.sleep(1)
+
+
+class FileWatcher:
+    def __init__(self) -> None:
+        definition = KaaDefinition()
+        self.path = definition.get_base_path()
+        self.interval = definition.get_polling_interval()
+        self.validator = ElementValidator(*definition.get_polling_paths())
+
+    def watch(self, callback):
+        last_mtime = None
+        while True:
+            current_mtime = max(
+                os.path.getmtime(os.path.join(root, f))
+                for root, _, files in os.walk(self.path)
+                if self.validator.is_valid(root)
+                for f in files
+                if self.validator.is_valid(f)
+            )
+            if last_mtime and current_mtime > last_mtime:
+                print("Changes detected.")
+                callback("restart")
+            last_mtime = current_mtime
+            time.sleep(self.interval)
+
+
+class ElementValidator:
+    def __init__(self, inclusions: list, exclusions: list) -> None:
+        self.inclusions = inclusions
+        self.exclusions = exclusions
+
+    def is_valid(self, element: str) -> bool:
+        if not element.strip():
+            return False
+        normalized = os.path.normpath(element)
+        if self.exclusions:
+            for exclude in self.exclusions:
+                if fnmatch.fnmatch(normalized, exclude):
+                    return False
+        if self.inclusions:
+            for include in self.inclusions:
+                if fnmatch.fnmatch(normalized, include):
+                    return True
+            return False
+        return True

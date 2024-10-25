@@ -100,6 +100,9 @@ class Cli:
         host = self.definitions.get_host()
         port = self.definitions.get_port()
         sys.stdout.write(f"Server started at http://{host}:{port}\n\n")
+        sys.stdout.write("Key commands:\n")
+        sys.stdout.write("- Press 'r' then Enter to restart.\n")
+        sys.stdout.write("- Press 'q' then Enter to quit.\n\n")
         if not hasattr(self, "server") or self.server is None:
             self.server = Server().get_server()
         self.wsgi_server = make_server(
