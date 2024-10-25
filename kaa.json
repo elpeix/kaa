@@ -10,26 +10,15 @@
   "developmentPolling": {
     "enabled": true,
     "intervalSeconds": 1,
-    "inclusions": {
-      "directories": [
-        "src"
-      ],
-      "files": [
-        "*.py"
-      ]
-    },
-    "exclusions": {
-      "directories": [
-        "docs",
-        "tests",
-        "__pycache__"
-      ],
-      "files": [ 
-        "*.pyc",
-        "*.md",
-        "*.log",
-        "LICENSE"
-      ]
-    }
+    "include": ["kaa", "example", ".", "*.py", "*.json"],
+    "exclude": [
+      "docs",
+      "tests",
+      "__pycache__",
+      "*.pyc",
+      "*.md",
+      "*.log",
+      "LICENSE"
+    ]
   }
 }

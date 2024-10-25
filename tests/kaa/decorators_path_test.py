@@ -80,7 +80,6 @@ class TestDecoratorPath(TestDecorators):
         def wrap(self_rest, **result_args):
             for arg_name in expected_args:
                 if assertion_args is not None:
-                    print(arg_name)
                     assertion_args(arg_name in result_args)
                 if assertion_values is not None:
                     assertion_values(result_args[arg_name], expected_args[arg_name])

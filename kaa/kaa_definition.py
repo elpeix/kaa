@@ -28,10 +28,17 @@ class KaaDefinition(metaclass=KaaDefinitionMeta):
 
     DEFAULT_POLLING_ENABLED = True
     DEFAULT_POLLING_INTERVAL = 1
-    DEFAULT_POLLING_INCLUDE_DIRS = []
-    DEFAULT_POLLING_INCLUDE_FILES = []
-    DEFAULT_POLLING_EXCLUDE_DIRS = [".git", ".idea", "__pycache__", "venv"]
-    DEFAULT_POLLING_EXCLUDE_FILES = ["*.pyc", "*.md", "*.log", "LICENSE"]
+    DEFAULT_POLLING_INCLUDE = []
+    DEFAULT_POLLING_EXCLUDE = [
+        ".git",
+        ".idea",
+        "__pycache__",
+        "venv",
+        "*.pyc",
+        "*.md",
+        "*.log",
+        "LICENSE",
+    ]
 
     host = "localhost"
     port = 5321
@@ -90,20 +97,10 @@ class KaaDefinition(metaclass=KaaDefinitionMeta):
             "intervalSeconds", self.DEFAULT_POLLING_INTERVAL
         )
 
-    def get_polling_inclusions(self):
+    def get_polling_paths(self):
         return (
-            self.__get_polling_inclusions(
-                "directories", self.DEFAULT_POLLING_INCLUDE_DIRS
-            ),
-            self.__get_polling_inclusions("files", self.DEFAULT_POLLING_INCLUDE_FILES),
-        )
-
-    def get_polling_exclusions(self):
-        return (
-            self.__get_polling_exclusions(
-                "directories", self.DEFAULT_POLLING_EXCLUDE_DIRS
-            ),
-            self.__get_polling_exclusions("files", self.DEFAULT_POLLING_EXCLUDE_FILES),
+            self.__get_polling_definition("include", self.DEFAULT_POLLING_INCLUDE),
+            self.__get_polling_definition("exclude", self.DEFAULT_POLLING_EXCLUDE),
         )
 
     def is_debug(self):
@@ -111,14 +108,6 @@ class KaaDefinition(metaclass=KaaDefinitionMeta):
 
     def cors_enabled(self):
         return self.__get_definition("enableCors", self.DEFAULT_ENABLE_CORS)
-
-    def __get_polling_inclusions(self, key, default_value):
-        inclusions = self.__get_polling_definition("inclusions", {})
-        return self.__get_value(inclusions, key, default_value)
-
-    def __get_polling_exclusions(self, key, default_value):
-        exclusions = self.__get_polling_definition("exclusions", {})
-        return self.__get_value(exclusions, key, default_value)
 
     def __get_polling_definition(self, key, default_value):
         development_polling = self.__get_definition("developmentPolling", {})

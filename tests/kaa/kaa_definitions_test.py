@@ -28,13 +28,9 @@ class TestKaaDefinition:
         assert KaaDefinition.DEFAULT_POLLING_ENABLED == definition.is_polling_enabled()
         assert KaaDefinition.DEFAULT_POLLING_INTERVAL, definition.get_polling_interval()
         assert (
-            KaaDefinition.DEFAULT_POLLING_INCLUDE_DIRS,
-            KaaDefinition.DEFAULT_POLLING_INCLUDE_FILES,
-        ) == definition.get_polling_inclusions()
-        assert (
-            KaaDefinition.DEFAULT_POLLING_EXCLUDE_DIRS,
-            KaaDefinition.DEFAULT_POLLING_EXCLUDE_FILES,
-        ) == definition.get_polling_exclusions()
+            KaaDefinition.DEFAULT_POLLING_INCLUDE,
+            KaaDefinition.DEFAULT_POLLING_EXCLUDE,
+        ) == definition.get_polling_paths()
 
     def test_with_values(self):
         json_path = self.__get_json_path("with_values.json")
@@ -51,17 +47,10 @@ class TestKaaDefinition:
         assert polling["enabled"] == definition_value.is_polling_enabled()
         assert polling["intervalSeconds"] == definition_value.get_polling_interval()
 
-        inclusions = polling["inclusions"]
         assert (
-            inclusions["directories"],
-            inclusions["files"],
-        ) == definition_value.get_polling_inclusions()
-
-        exclusions = polling["exclusions"]
-        assert (
-            exclusions["directories"],
-            exclusions["files"],
-        ) == definition_value.get_polling_exclusions()
+            polling["include"],
+            polling["exclude"],
+        ) == definition_value.get_polling_paths()
 
     def __get_json_path(self, file_name):
         return f"{self.base_path}/fixtures/{file_name}"

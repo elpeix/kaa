@@ -10,13 +10,7 @@
   "developmentPolling": {
     "enabled": true,
     "intervalSeconds": 5,
-    "inclusions": {
-      "directories": ["src"],
-      "files": ["*.py"]
-    },
-    "exclusions": {
-      "directories": ["tests", "__pycache__"],
-      "files": ["*.pyc", "*.log"]
-    }
+    "include": ["src", "*.py"],
+    "exclude": ["tests", "__pycache__", "*.pyc", "*.log"]
   }
 }
