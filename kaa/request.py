@@ -1,4 +1,5 @@
 import json
+import urllib.parse
 
 
 class Request:
@@ -24,6 +25,7 @@ class Request:
         return query_params
 
     def __set_query_value(self, key, value, query_params):
+        value = self.__decode_query_value(value)
         if key in query_params:
             if isinstance(query_params[key], list):
                 query_params[key].append(value)
@@ -31,6 +33,10 @@ class Request:
                 query_params[key] = [query_params[key], value]
         else:
             query_params[key] = value
+
+    def __decode_query_value(self, value):
+        value = value.replace("+", " ")
+        return urllib.parse.unquote(value)
 
     def __get_headers(self):
         headers = {}
