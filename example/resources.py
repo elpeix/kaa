@@ -1,3 +1,4 @@
+import datetime
 from kaa import AUTH, DELETE, GET, PATCH, PATH, POST, PUT, Response, Status, resources
 from kaa.exceptions import ForbiddenError
 
@@ -31,6 +32,7 @@ class Resources(resources.Resources):
             "iparam": iparam,
             "fparam": fparam,
             "message": "Get resource /resource/{id}/",
+            "someDate": datetime.datetime.now(),
         }
         return Response(Status.OK).json(result)
 
