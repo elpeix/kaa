@@ -53,7 +53,7 @@ class Kaa:
             self.__request_filters(request)
             for module_name, class_names in self.resources.items():
                 for class_name in class_names:
-                    response: Response = self.__run_resource(
+                    response: Response | None = self.__run_resource(
                         request, module_name, class_name
                     )
                     if response:
@@ -71,7 +71,10 @@ class Kaa:
         if self.openapi is None:
             self.openapi = OpenApi().generate(self)
         response = Response()
-        if request.get_header("ACCEPT") == "application/json" or response_format == "json":
+        if (
+            request.get_header("ACCEPT") == "application/json"
+            or response_format == "json"
+        ):
             response.json(self.openapi)
         else:
             try:
@@ -109,7 +112,9 @@ class Kaa:
             for class_name in filters[module_name]:
                 func(self.__get_class(module_name, class_name))
 
-    def __run_resource(self, request: Request, module_name, class_name) -> Response:
+    def __run_resource(
+        self, request: Request, module_name, class_name
+    ) -> Response | None:
         class_ = self.__get_class(module_name, class_name)
         instance: Resources = class_(request)
         for method_name in dir(class_):

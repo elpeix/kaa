@@ -1,3 +1,4 @@
+import datetime
 import json
 import traceback
 
@@ -31,9 +32,17 @@ class Response:
         except ImportError:
             return self.body("YAML is not supported")
 
+    def __json_serialize(self, response):
+        if isinstance(response, (datetime.date, datetime.datetime)):
+            return response.isoformat()
+        raise TypeError(f"Type {type(response)} not serializable")
+
     def json(self, response: dict):
         self.set_content_type(ContentType.JSON)
-        return self.body(json.dumps(response))
+        try:
+            return self.body(json.dumps(response, default=self.__json_serialize))
+        except Exception as e:
+            return json.dumps(e)
 
     def get_status_code(self):
         return self.status.value[1]
@@ -60,14 +69,12 @@ class Response:
             if self.definitions.is_debug():
                 data["exception"] = traceback.format_exception(*exc_info)
             else:
-                self.definitions.log.error(
-                    self.status.value, exc_info=exc_info)
+                self.definitions.log.error(self.status.value, exc_info=exc_info)
         return self.__set_response(request, "Internal server error", data)
 
     def __set_response(self, request: Request, message, data: dict = {}):
         if request.get_header("ACCEPT") == "application/json":
-            self.json(
-                {"status": self.status.value[0], "message": message, **data})
+            self.json({"status": self.status.value[0], "message": message, **data})
         else:
             self.body(message + "\n" + str(data) if data else message)
         return self
