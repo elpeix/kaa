@@ -23,12 +23,7 @@ pip install kaa-rest-server
     "enabled": true,
     "intervalSeconds": 1,
     "include": [".", "src", "*.py"],
-    "exclude": [
-      "docs",
-      "tests",
-      "__pycache__",
-      "*.md"
-    ]
+    "exclude": ["docs", "tests", "__pycache__", "*.md"]
   }
 }
 ```
