@@ -21,3 +21,13 @@ class ContentType(Enum):
     HTML = "text/html"
     JSON = "application/json"
     YAML = "application/x-yaml"
+
+    @classmethod
+    def recreate(cls, content_type: str):
+        if content_type == ContentType.JSON.value:
+            return ContentType.JSON
+        if content_type == ContentType.HTML.value:
+            return ContentType.HTML
+        if content_type == ContentType.YAML.value:
+            return ContentType.YAML
+        return ContentType.PLAIN

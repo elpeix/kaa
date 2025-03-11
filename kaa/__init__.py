@@ -1,5 +1,5 @@
 from .authorization import Authorization  # noqa
-from .decorators import AUTH, GET, PATH, POST, PATCH, PUT, DELETE  # noqa
+from .decorators import AUTH, GET, PATH, POST, PATCH, PUT, DELETE, Path, Produces  # noqa
 from .enums import ContentType, Status  # noqa
 from .exceptions import (
     KaaError,

@@ -1,5 +1,18 @@
 import datetime
-from kaa import AUTH, DELETE, GET, PATCH, PATH, POST, PUT, Response, Status, resources
+from kaa import (
+    AUTH,
+    DELETE,
+    GET,
+    PATCH,
+    POST,
+    PUT,
+    Path,
+    Produces,
+    Response,
+    Status,
+    resources,
+)
+from kaa.enums import ContentType
 from kaa.exceptions import ForbiddenError
 
 from .authorization import Auth
@@ -7,13 +20,20 @@ from .authorization import Auth
 
 class Resources(resources.Resources):
     @GET
-    @PATH(uri="/", query_params={"param": {"description": "Basic param"}})
+    @Path(uri="/", query_params={"param": {"description": "Basic param"}})
     def base_resource(self, **params):
         result = {"message": f"Get resource / with params: {params}"}
         return Response(Status.OK).json(result)
 
     @GET
-    @PATH(
+    @Path("/resource")
+    @Produces(ContentType.JSON)
+    def resource(self):
+        result = {"message": "Get resource /resource"}
+        return Response(Status.OK).of(result)
+
+    @GET
+    @Path(
         "/resource/{resource_id}/",
         description="Resource with id",
         path_params={"id": {"type": "int", "description": "Identifier for resource"}},
@@ -37,30 +57,32 @@ class Resources(resources.Resources):
         return Response(Status.OK).json(result)
 
     @GET
-    @PATH("/error")
+    @Path("/error")
+    @Produces(ContentType.JSON)
     def error_resource(self):
         raise ForbiddenError("This is an error")
 
     @GET
-    @PATH("/authorize")
+    @Path("/authorize")
+    @Produces(ContentType.JSON)
     @AUTH(Auth())
     def resource_auth(self):
         return Response(Status.OK).json({"message": "authorized"})
 
     @POST
-    @PATH("/doPost")
+    @Path("/doPost")
     def resource_post(self):
         request_body = self.request.get_request_body()
         return Response(Status.OK).json({"message": "posted", "data": request_body})
 
     @PATCH
-    @PATH("/doPatch")
+    @Path("/doPatch")
     def resource_patch(self):
         request_body = self.request.get_request_body()
         return Response(Status.OK).json({"message": "patched", "data": request_body})
 
     @PUT
-    @PATH("/doPut/{resource_id}/")
+    @Path("/doPut/{resource_id}/")
     def resource_put(self, resource_id):
         request_body = self.request.get_request_body()
         return Response(Status.OK).json(
@@ -68,6 +90,6 @@ class Resources(resources.Resources):
         )
 
     @DELETE
-    @PATH("/doDelete/{resource_id}/")
+    @Path("/doDelete/{resource_id}/")
     def resource_delete(self, resource_id):
         return Response(Status.OK).json({"message": "deleted", "id": resource_id})

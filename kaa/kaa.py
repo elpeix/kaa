@@ -4,7 +4,7 @@ import sys
 import kaa
 from .kaa_definition import KaaDefinition
 
-from .enums import Status
+from .enums import ContentType, Status
 from .exceptions import KaaError, ResourceNotFoundError
 from .filters import RequestFilter, ResponseFilter
 from .openapi import OpenApi
@@ -58,13 +58,13 @@ class Kaa:
                     )
                     if response:
                         self.__response_filters(request, response)
-                        return self.__print_response(response)
+                        return self.__print_response(request, response)
             raise ResourceNotFoundError()
         except KaaError as e:
-            return self.__print_response(e.response())
+            return self.__print_response(request, e.response())
         except Exception:
             return self.__print_response(
-                Response().server_error(request, sys.exc_info())
+                request, Response().server_error(request, sys.exc_info())
             )
 
     def __get_openapi(self, request: Request, response_format="yaml"):
@@ -91,7 +91,7 @@ class Kaa:
             self.__response_filters(request, response)
         else:
             response = Response(Status.METHOD_NOT_ALLOWED)
-        return self.__print_response(response.body(""))
+        return self.__print_response(request, response.body(""))
 
     def __request_filters(self, request: Request):
         def func(instance: RequestFilter):
@@ -131,10 +131,17 @@ class Kaa:
         module = importlib.import_module(module_name)
         return getattr(module, class_name)
 
-    def __print_response(self, response: Response):
+    def __print_response(self, request: Request, response: Response):
         headers = [(k, response.headers[k]) for k in response.headers]
         headers.append(("Server", f"{kaa.NAME}/{kaa.VERSION}"))
         self.start_response(response.get_status_code(), headers)
         if response.response_body is None:
             return []
-        return [response.response_body.encode("utf8")]
+        if isinstance(response.response_body, dict) or not response.ready:
+            response = response.get_response(
+                accept=ContentType.recreate(request.get_header("ACCEPT"))
+            )
+        body = response.response_body
+        if isinstance(body, str):
+            body = body.encode("utf8")
+        return [body]
