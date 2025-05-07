@@ -39,12 +39,7 @@ Download code from <https://github.com/elpeix/kaa>.
     "enabled": true,
     "intervalSeconds": 1,
     "include": [".", "src", "*.py"],
-    "exclude": [
-      "docs",
-      "tests",
-      "__pycache__",
-      "*.md"
-    ]
+    "exclude": ["docs", "tests", "__pycache__", "*.md"]
   }
 }
 ```
@@ -133,12 +128,12 @@ class Server(KaaServer):
 ### Resources
 
 ```python
-from kaa import GET, PATH, Resources, Response, Status
+from kaa import GET, Path, Resources, Response, Status
 
 class AppResources(Resources):
 
     @GET
-    @PATH("/")
+    @Path("/")
     def basic_resource(self, **params):
         return Response(Status.OK).json({
             "message": "your response"
@@ -150,7 +145,7 @@ classes must extend **Resource** from **kaa** module.
 
 #### Path
 
-Decorator @PATH
+Decorator @Path
 
 ##### Argument uri
 
@@ -162,9 +157,9 @@ based on the substituted uri. Variables are denoted by braces (`{` and `}`).
 Example:
 
 ```python
-@PATH("/users/{username}")
+@Path("/users/{username}")
 # or
-@PATH(uri="/users/{username}")
+@Path(uri="/users/{username}")
 ```
 
 In this example, a user is prompted to type his or her name, and then Kaa
@@ -178,7 +173,7 @@ These uri variables allows create a simple regular expression to filter URL.
 Example:
 
 ```python
-@PATH("/books/{id:[0-9]}")
+@Path("/books/{id:[0-9]}")
 ```
 
 In this example, a id book must be a number.
@@ -199,7 +194,7 @@ Example:
 
 ```python
 @GET
-@PATH("/books",
+@Path("/books",
       query_params={
          "max_results": {"type": "int", "default": 10},
          "page": {"type": "int", "default": 1}
@@ -226,7 +221,7 @@ A query param can be required.
 
 ```python
 @GET
-@PATH("/books/search",
+@Path("/books/search",
       query_params={
          "q": {"type": "string", "required": True},
          "max_results": {"type": "int", "default": 10},
@@ -247,7 +242,7 @@ Example:
 
 ```python
 @GET
-@PATH("/writer/{id:[0-9]}/books",
+@Path("/writer/{id:[0-9]}/books",
       query_params={
          "max_results": {"type": "int", "default": 10},
          "page": {"type": "int", "default": 1}
@@ -284,7 +279,7 @@ Example:
 ```python
 @POST
 @AUTH(Auth())
-@PATH("/book")
+@Path("/book")
  def add_book(id):
     pass
 ```

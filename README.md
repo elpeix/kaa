@@ -55,13 +55,13 @@ class MyServer(KaaServer):
 This class define your resources (or routes):
 
 ```python
-from kaa import GET, PATH, Resources, Response, Status
+from kaa import GET, Path, Resources, Response, Status
 
 
 class AppResources(Resources):
 
     @GET
-    @PATH("/")
+    @Path("/")
     def basic_resource(self, **params):
         return Response(Status.OK).json({
             "message": "your response"
