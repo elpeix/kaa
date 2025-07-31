@@ -1,5 +1,8 @@
 import re
 
+from kaa.enums import ContentType
+from kaa.response import Response
+
 from .authorization import Authorization
 from .exceptions import InvalidParamError
 from .request import Request
@@ -57,7 +60,22 @@ def DELETE(func):
     return wrapper
 
 
-def PATH(uri, query_params: dict = {}, **kwargs):
+def Produces(content_type: ContentType):
+    def decorator_path(func):
+        def wrapper(self, **kwargs):
+            self.request.set_force_accept(content_type)
+            response = func(self, **kwargs)
+            if response is not None and type(response) is Response:
+                response.set_content_type(content_type)
+                return response.get_response()
+            return response
+
+        return wrapper
+
+    return decorator_path
+
+
+def Path(uri, query_params: dict = {}, **kwargs):
     def decorator_path(func):
         def wrapper(self):
             request_path = self.request.path.strip("/")
@@ -94,6 +112,10 @@ def PATH(uri, query_params: dict = {}, **kwargs):
         return wrapper
 
     return decorator_path
+
+
+# Deprecated PATH
+PATH = Path  # Alias for PATH.
 
 
 class QueryParams:
@@ -135,5 +157,4 @@ class QueryParams:
         try:
             return func(value)
         except ValueError as error:
-            raise InvalidParamError(
-                f"Param {param} is not a number", error) from error
+            raise InvalidParamError(f"Param {param} is not a number", error) from error

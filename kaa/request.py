@@ -1,6 +1,8 @@
 import json
 import urllib.parse
 
+from kaa.enums import ContentType
+
 
 class Request:
     def __init__(self, env):
@@ -11,6 +13,7 @@ class Request:
         self.content_type = self.env["CONTENT_TYPE"]
         self.query = self.__get_query()
         self.headers = self.__get_headers()
+        self.force_accept = None
         self.data = RequestData()
 
     def __get_query(self):
@@ -49,6 +52,12 @@ class Request:
         if key in self.headers:
             return self.headers[key]
         return None
+
+    def set_force_accept(self, content_type: ContentType):
+        self.force_accept = content_type
+
+    def get_force_accept(self):
+        return self.force_accept
 
     def get_query_param(self, key):
         if key in self.query:

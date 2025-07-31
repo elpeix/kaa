@@ -10,13 +10,20 @@ from .request import Request
 class Response:
     def __init__(self, status: Status = Status.OK):
         self.response_body = None
+        self.ready = False
         self.status = status
         self.headers = dict()
         self.set_content_type(ContentType.PLAIN)
         self.definitions = KaaDefinition()
 
     def body(self, response_body: str):
-        self.response_body = response_body
+        self.response_body = str(response_body)
+        self.ready = True
+        return self
+
+    def of(self, response: dict | str):
+        self.response_body = response
+        self.ready = not isinstance(response, dict)
         return self
 
     def html(self, html: str):
@@ -48,6 +55,7 @@ class Response:
         return self.status.value[1]
 
     def set_content_type(self, content_type: ContentType):
+        self.content_type = content_type
         self.header("Content-Type", content_type.value)
 
     def header(self, header_name, header_value):
@@ -60,7 +68,8 @@ class Response:
 
     def forbidden(self, request: Request):
         self.status = Status.FORBIDDEN
-        return self.__set_response(request, "Fobidden")
+        self.response_body = "Forbidden"
+        return self
 
     def server_error(self, request: Request, exc_info=None):
         self.status = Status.SERVER_ERROR
@@ -73,8 +82,33 @@ class Response:
         return self.__set_response(request, "Internal server error", data)
 
     def __set_response(self, request: Request, message, data: dict = {}):
-        if request.get_header("ACCEPT") == "application/json":
+        if (
+            request.get_header("ACCEPT") == "application/json"
+            or request.get_force_accept() == ContentType.JSON
+        ):
             self.json({"status": self.status.value[0], "message": message, **data})
         else:
             self.body(message + "\n" + str(data) if data else message)
         return self
+
+    def get_response(self, accept: ContentType | None = None):
+        content_type = self.__get_content_type(accept)
+        if content_type == ContentType.JSON:
+            return self.json(self.__get_dict_body())
+        if content_type == ContentType.HTML:
+            return self.html(str(self.response_body or ""))
+        if content_type == ContentType.YAML:
+            return self.yaml(self.__get_dict_body())
+        return self.body(str(self.response_body or ""))
+
+    def __get_content_type(self, accept: ContentType | None = None) -> ContentType:
+        if self.content_type is not None and self.content_type != ContentType.PLAIN:
+            return self.content_type
+        if accept:
+            return accept
+        return ContentType.PLAIN
+
+    def __get_dict_body(self) -> dict:
+        if isinstance(self.response_body, dict):
+            return self.response_body
+        return {"data": self.response_body}
